@@ -1,0 +1,41 @@
+# Java/Maven
+/target/
+*.log
+*.class
+*.jar
+*.war
+*.iml
+
+# Node/Vite/React
+/node_modules/
+/dist/
+/.env*
+
+# Docker
+*.pid
+*.swp
+
+# IDE
+/.idea/
+/.vscode/
+*.sublime*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Neo4j data
+backend/data/
+frontend/data/
+
+# Codespaces
+*.code-workspace
+
+# Others
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (如有)
+__pycache__/
+*.pyc
