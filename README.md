@@ -41,7 +41,7 @@ docker-compose up --build
 后端（需要 Java 17 + Maven）:
 ```bash
 cd backend
-mvn clean package
+mvn clean package -DskipTests
 java -jar target/smart-telecom-backend-0.1.0.jar
 ```
 
