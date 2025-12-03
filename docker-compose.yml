@@ -6,8 +6,8 @@ services:
     environment:
       - NEO4J_AUTH=neo4j/neo4j_test_pass
       # 允许远程 Bolt 和 HTTP 连接（解决 GitHub Codespaces WebSocket 问题）
-      - NEO4J_server_bolt_advertised_address=0.0.0.0:7687
-      - NEO4J_server_http_advertised_address=0.0.0.0:7474
+      # 环境变量已移除：这些 NEO4J_* 变量会被翻译成未识别的配置键（例如 server.bolt.advertised.address），
+      # 在 Neo4j 5 中导致容器启动失败。默认端口绑定由 ports 配置处理。
     ports:
       - "7474:7474"
       - "7687:7687"
