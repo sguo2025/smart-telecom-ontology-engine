@@ -101,8 +101,8 @@ public class RdfService {
         String base = "http://example.org/ont#";
 
         // Fetch nodes
-        List<Map<String, Object>> nodes = neo4jClient.query("MATCH (n) RETURN n.iri as iri, labels(n) as labels, properties(n) as props")
-                .fetch().all();
+        Collection<Map<String, Object>> nodes = neo4jClient.query("MATCH (n) RETURN n.iri as iri, labels(n) as labels, properties(n) as props")
+            .fetch().all();
 
         Map<String, org.apache.jena.rdf.model.Resource> nodeMap = new HashMap<>();
 
@@ -139,8 +139,8 @@ public class RdfService {
         }
 
         // Fetch relationships
-        List<Map<String, Object>> rels = neo4jClient.query("MATCH (a)-[r]->(b) RETURN a.iri as a, type(r) as t, b.iri as b")
-                .fetch().all();
+        Collection<Map<String, Object>> rels = neo4jClient.query("MATCH (a)-[r]->(b) RETURN a.iri as a, type(r) as t, b.iri as b")
+            .fetch().all();
 
         for (Map<String, Object> row : rels) {
             Object aobj = row.get("a");
