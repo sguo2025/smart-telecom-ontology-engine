@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.service.ReasoningService;
 import com.example.demo.service.ReasoningService.ReasonerType;
+import com.example.demo.service.RdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,13 @@ public class ReasoningController {
     @Autowired
     private ReasoningService reasoningService;
     
+    @Autowired
+    private RdfService rdfService;
+    
     /**
      * 执行推理
      * 
-     * @param request 包含 rdfData, reasonerType, customRules, saveToNeo4j 的请求体
+     * @param request 包含 rdfData, reasonerType, customRules, saveToNeo4j, useNeo4jData 的请求体
      * @return 推理结果
      */
     @PostMapping(value = "/execute", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,6 +39,23 @@ public class ReasoningController {
             String reasonerTypeStr = (String) request.get("reasonerType");
             String customRules = (String) request.getOrDefault("customRules", "");
             Boolean saveToNeo4j = (Boolean) request.getOrDefault("saveToNeo4j", false);
+            Boolean useNeo4jData = (Boolean) request.getOrDefault("useNeo4jData", false);
+            
+            // 如果选择从 Neo4j 读取数据
+            if (useNeo4jData != null && useNeo4jData) {
+                try {
+                    rdfData = rdfService.exportToTurtle();
+                    if (rdfData == null || rdfData.trim().isEmpty()) {
+                        return ResponseEntity.badRequest().body(
+                            createErrorResponse("Neo4j 中没有数据。请先导入 RDF 数据。")
+                        );
+                    }
+                } catch (Exception e) {
+                    return ResponseEntity.status(500).body(
+                        createErrorResponse("从 Neo4j 读取数据失败: " + e.getMessage())
+                    );
+                }
+            }
             
             if (rdfData == null || rdfData.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(

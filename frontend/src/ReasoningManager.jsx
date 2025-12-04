@@ -13,6 +13,7 @@ export default function ReasoningManager() {
   const [examples, setExamples] = useState({})
   const [showRules, setShowRules] = useState(false)
   const [activeTab, setActiveTab] = useState('result') // result, inferred, stats
+  const [useNeo4jData, setUseNeo4jData] = useState(false)
 
   useEffect(() => {
     // 加载推理器类型
@@ -33,10 +34,44 @@ export default function ReasoningManager() {
     setShowRules(reasonerType === 'CUSTOM')
   }, [reasonerType])
 
+  // 从 Neo4j 加载数据
+  const handleLoadFromNeo4j = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/rdf/export', {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/turtle',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.text()
+        if (data && data.trim()) {
+          setRdfData(data)
+          setUseNeo4jData(true)
+          alert('✓ 已从 Neo4j 加载数据')
+        } else {
+          setError('Neo4j 中没有数据，请先导入 RDF 数据')
+        }
+      } else {
+        const errorMsg = await response.text()
+        setError(`从 Neo4j 加载失败: ${errorMsg}`)
+      }
+    } catch (err) {
+      setError(`网络错误: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // 执行推理
   const handleExecuteReasoning = async () => {
-    if (!rdfData.trim()) {
-      setError('请输入 RDF 数据')
+    // 如果选择从 Neo4j 使用数据，允许空的 rdfData
+    if (!useNeo4jData && !rdfData.trim()) {
+      setError('请输入 RDF 数据或从 Neo4j 加载')
       return
     }
 
@@ -56,10 +91,11 @@ export default function ReasoningManager() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          rdfData,
+          rdfData: useNeo4jData ? '' : rdfData,
           reasonerType,
           customRules: reasonerType === 'CUSTOM' ? customRules : '',
           saveToNeo4j,
+          useNeo4jData,
         }),
       })
 
@@ -175,15 +211,34 @@ export default function ReasoningManager() {
 
           {/* RDF 数据输入 */}
           <div className="form-group">
-            <label>RDF 数据 (Turtle/RDF-XML/JSON-LD):</label>
+            <label>
+              RDF 数据 (Turtle/RDF-XML/JSON-LD):
+              {useNeo4jData && <span style={{ color: '#27ae60', marginLeft: '8px', fontSize: '13px' }}>✓ 使用 Neo4j 数据</span>}
+            </label>
             <textarea
               value={rdfData}
-              onChange={(e) => setRdfData(e.target.value)}
-              placeholder="输入 RDF 数据..."
+              onChange={(e) => {
+                setRdfData(e.target.value)
+                setUseNeo4jData(false)
+              }}
+              placeholder="输入 RDF 数据，或点击下方按钮从 Neo4j 加载..."
               rows="10"
               disabled={loading}
               className="form-textarea"
             />
+            <div style={{ marginTop: '8px' }}>
+              <button
+                onClick={handleLoadFromNeo4j}
+                disabled={loading}
+                className="btn btn-secondary btn-sm"
+                style={{ marginRight: '8px' }}
+              >
+                📥 从 Neo4j 加载数据
+              </button>
+              <span style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                加载之前导入到图数据库的 RDF 数据
+              </span>
+            </div>
           </div>
 
           {/* 自定义规则输入 (仅当选择 CUSTOM 时显示) */}
