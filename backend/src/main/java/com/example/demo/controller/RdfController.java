@@ -39,4 +39,15 @@ public class RdfController {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
+
+    // GET graph data for visualization
+    @GetMapping(value = "/graph-data", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getGraphData() {
+        try {
+            var graphData = rdfService.getGraphData();
+            return ResponseEntity.ok(graphData);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
 }

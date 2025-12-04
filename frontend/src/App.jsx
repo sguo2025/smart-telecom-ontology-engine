@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import RdfManager from './RdfManager'
 import ReasoningManager from './ReasoningManager'
+import GraphVisualization from './GraphVisualization'
 import './App.css'
 
 export default function App() {
@@ -51,19 +52,7 @@ export default function App() {
       <main className="app-main">
         {activeView === 'rdf' && <RdfManager />}
         {activeView === 'reasoning' && <ReasoningManager />}
-        {activeView === 'graph' && (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#95a5a6' }}>
-            <h2>🔗 知识图谱可视化</h2>
-            <p>功能开发中...</p>
-            <p style={{ marginTop: '20px', fontSize: '14px' }}>
-              您可以访问 Neo4j Browser 查看图谱: 
-              <a href="http://localhost:7474" target="_blank" rel="noopener noreferrer" 
-                 style={{ color: '#3498db', marginLeft: '8px' }}>
-                http://localhost:7474
-              </a>
-            </p>
-          </div>
-        )}
+        {activeView === 'graph' && <GraphVisualization />}
       </main>
 
       <footer className="app-footer">

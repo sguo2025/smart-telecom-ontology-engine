@@ -204,4 +204,44 @@ public class RdfService {
         RDFDataMgr.write(out, model, Lang.TURTLE);
         return out.toString(StandardCharsets.UTF_8);
     }
+
+    // Get graph data for visualization
+    public Map<String, Object> getGraphData() {
+        Map<String, Object> result = new HashMap<>();
+        
+        // Fetch nodes with their properties and labels
+        List<Map<String, Object>> nodes = new ArrayList<>();
+        Collection<Map<String, Object>> nodeRows = neo4jClient.query(
+            "MATCH (n) RETURN id(n) as id, n.iri as iri, labels(n) as labels, properties(n) as properties LIMIT 500"
+        ).fetch().all();
+        
+        for (Map<String, Object> row : nodeRows) {
+            Map<String, Object> node = new HashMap<>();
+            node.put("id", row.get("iri") != null ? row.get("iri").toString() : "node_" + row.get("id"));
+            node.put("labels", row.get("labels"));
+            node.put("properties", row.get("properties"));
+            nodes.add(node);
+        }
+        
+        // Fetch relationships
+        List<Map<String, Object>> relationships = new ArrayList<>();
+        Collection<Map<String, Object>> relRows = neo4jClient.query(
+            "MATCH (a)-[r]->(b) RETURN a.iri as source, b.iri as target, type(r) as type, id(a) as sourceId, id(b) as targetId LIMIT 1000"
+        ).fetch().all();
+        
+        for (Map<String, Object> row : relRows) {
+            Map<String, Object> rel = new HashMap<>();
+            String source = row.get("source") != null ? row.get("source").toString() : "node_" + row.get("sourceId");
+            String target = row.get("target") != null ? row.get("target").toString() : "node_" + row.get("targetId");
+            rel.put("source", source);
+            rel.put("target", target);
+            rel.put("type", row.get("type"));
+            relationships.add(rel);
+        }
+        
+        result.put("nodes", nodes);
+        result.put("relationships", relationships);
+        
+        return result;
+    }
 }
