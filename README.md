@@ -95,6 +95,7 @@ cd backend
 mvn spring-boot:run
 
 # 3. 启动前端
+npm install
 cd frontend
 npm run dev
 ```

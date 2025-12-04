@@ -9,8 +9,17 @@
 
 # Node/Vite/React
 /node_modules/
+*/node_modules/
 /dist/
+*/dist/
 /.env*
+*.local
+.vite/
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+*.tsbuildinfo
 
 # Docker
 *.pid
@@ -40,3 +49,4 @@ yarn-error.log*
 # Python (如有)
 __pycache__/
 *.pyc
+
