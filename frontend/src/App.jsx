@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import RdfManager from './RdfManager'
+import ReasoningManager from './ReasoningManager'
 import './App.css'
 
 export default function App() {
   const [msg, setMsg] = useState('...')
+  const [activeView, setActiveView] = useState('rdf') // rdf, reasoning, graph
 
   useEffect(() => {
     fetch('/api/persons/hello')
@@ -26,13 +28,42 @@ export default function App() {
       </header>
 
       <nav className="app-nav">
-        <div className="nav-item active">📊 RDF 管理</div>
-        <div className="nav-item">🔗 知识图谱</div>
-        <div className="nav-item">⚙️ 推理引擎</div>
+        <div 
+          className={`nav-item ${activeView === 'rdf' ? 'active' : ''}`}
+          onClick={() => setActiveView('rdf')}
+        >
+          📊 RDF 管理
+        </div>
+        <div 
+          className={`nav-item ${activeView === 'reasoning' ? 'active' : ''}`}
+          onClick={() => setActiveView('reasoning')}
+        >
+          🧠 推理引擎
+        </div>
+        <div 
+          className={`nav-item ${activeView === 'graph' ? 'active' : ''}`}
+          onClick={() => setActiveView('graph')}
+        >
+          🔗 知识图谱
+        </div>
       </nav>
 
       <main className="app-main">
-        <RdfManager />
+        {activeView === 'rdf' && <RdfManager />}
+        {activeView === 'reasoning' && <ReasoningManager />}
+        {activeView === 'graph' && (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#95a5a6' }}>
+            <h2>🔗 知识图谱可视化</h2>
+            <p>功能开发中...</p>
+            <p style={{ marginTop: '20px', fontSize: '14px' }}>
+              您可以访问 Neo4j Browser 查看图谱: 
+              <a href="http://localhost:7474" target="_blank" rel="noopener noreferrer" 
+                 style={{ color: '#3498db', marginLeft: '8px' }}>
+                http://localhost:7474
+              </a>
+            </p>
+          </div>
+        )}
       </main>
 
       <footer className="app-footer">
