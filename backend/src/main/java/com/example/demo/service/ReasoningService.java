@@ -139,6 +139,21 @@ public class ReasoningService {
      */
     public Map<String, Object> validateRules(String rules) {
         Map<String, Object> result = new HashMap<>();
+        
+        // 预检查：检查是否使用了未定义的前缀
+        if (rules.contains(":") && !rules.contains("<http://") && !rules.contains("<https://")) {
+            // 检查是否有类似 :property 的模式但没有 @prefix 定义
+            if (!rules.contains("@prefix")) {
+                result.put("valid", false);
+                result.put("error", "检测到使用了前缀（如 :property），但未定义 @prefix。\n" +
+                    "Jena 规则语法不支持 @prefix，请使用完整的 URI，例如：\n" +
+                    "  错误: (?x :hasParent ?y)\n" +
+                    "  正确: (?x <http://example.org/ont#hasParent> ?y)");
+                result.put("suggestion", "请点击'加载示例'查看正确的规则格式");
+                return result;
+            }
+        }
+        
         try {
             List<Rule> ruleList = Rule.parseRules(rules);
             result.put("valid", true);
@@ -154,9 +169,25 @@ public class ReasoningService {
                 ruleInfo.add(info);
             }
             result.put("rules", ruleInfo);
+            result.put("message", "规则验证通过！共 " + ruleList.size() + " 条规则。");
         } catch (Exception e) {
             result.put("valid", false);
-            result.put("error", e.getMessage());
+            String errorMsg = e.getMessage();
+            
+            // 提供更友好的错误信息
+            if (errorMsg.contains("Unrecognized qname prefix")) {
+                result.put("error", "规则语法错误: 使用了未定义的前缀\n\n" +
+                    "Jena 规则不支持 Turtle 风格的 @prefix 定义。\n" +
+                    "请使用完整的 URI，例如:\n\n" +
+                    "正确格式:\n" +
+                    "[rule1: (?x <http://example.org/ont#hasParent> ?y) -> (?x <http://example.org/ont#hasChild> ?y)]\n\n" +
+                    "错误格式:\n" +
+                    "[rule1: (?x :hasParent ?y) -> (?x :hasChild ?y)]");
+                result.put("suggestion", "点击'加载示例'查看正确的规则格式");
+            } else {
+                result.put("error", "规则解析失败: " + errorMsg);
+                result.put("suggestion", "请检查规则语法，确保格式正确");
+            }
         }
         return result;
     }
@@ -196,19 +227,23 @@ public class ReasoningService {
             ":Bob :ancestorOf :Charlie .\n\n" +
             "# 推理结果: :Alice :ancestorOf :Charlie");
         
-        // 自定义规则示例
+        // 自定义规则示例（使用完整 URI）
         examples.put("custom_family",
             "# 自定义家庭关系规则\n" +
-            "[rule1: (?x :hasParent ?y) (?y :hasParent ?z) -> (?x :hasGrandparent ?z)]\n" +
-            "[rule2: (?x :hasParent ?y) (?z :hasParent ?y) -> (?x :hasSibling ?z)]\n" +
-            "[rule3: (?x :hasSpouse ?y) (?y :hasParent ?z) -> (?x :hasInLaw ?z)]");
+            "# 注意: Jena 规则中需要使用完整 URI，不能使用未定义的前缀\n" +
+            "[rule1: (?x <http://example.org/ont#hasParent> ?y) (?y <http://example.org/ont#hasParent> ?z) -> (?x <http://example.org/ont#hasGrandparent> ?z)]\n" +
+            "[rule2: (?x <http://example.org/ont#hasParent> ?y) (?z <http://example.org/ont#hasParent> ?y) -> (?x <http://example.org/ont#hasSibling> ?z)]\n" +
+            "[rule3: (?x <http://example.org/ont#hasSpouse> ?y) (?y <http://example.org/ont#hasParent> ?z) -> (?x <http://example.org/ont#hasInLaw> ?z)]");
         
         // 电信领域示例
         examples.put("telecom_transfer",
-            "# 电信转网规则\n" +
-            "[highValueCustomer: (?c rdf:type :Customer) (?c :monthlySpend ?s) greaterThan(?s, 500) -> (?c rdf:type :HighValueCustomer)]\n" +
-            "[requiresApproval: (?r rdf:type :TransferRequest) (?r :sourceCustomer ?c) (?c rdf:type :HighValueCustomer) -> (?r :requiresManagerApproval 'true')]\n" +
-            "[autoApprove: (?r rdf:type :TransferRequest) (?r :amount ?a) lessThan(?a, 100) -> (?r :autoApproved 'true')]");
+            "# 电信转网业务规则\n" +
+            "# 规则 1: 高价值客户识别\n" +
+            "[highValueCustomer: (?c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/ont#Customer>) (?c <http://example.org/ont#monthlySpend> ?s) greaterThan(?s, 500) -> (?c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/ont#HighValueCustomer>)]\n\n" +
+            "# 规则 2: 高价值客户转网需要经理审批\n" +
+            "[requiresApproval: (?r <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/ont#TransferRequest>) (?r <http://example.org/ont#sourceCustomer> ?c) (?c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/ont#HighValueCustomer>) -> (?r <http://example.org/ont#requiresManagerApproval> 'true')]\n\n" +
+            "# 规则 3: 小额转网自动批准\n" +
+            "[autoApprove: (?r <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/ont#TransferRequest>) (?r <http://example.org/ont#amount> ?a) lessThan(?a, 100) -> (?r <http://example.org/ont#autoApproved> 'true')]");
         
         return examples;
     }
