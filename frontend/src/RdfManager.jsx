@@ -8,10 +8,10 @@ export default function RdfManager() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // 导入 Turtle 数据
+  // 导入 RDF 数据 (自动检测格式)
   const handleImport = async () => {
     if (!turtleData.trim()) {
-      setError('请输入 Turtle 数据')
+      setError('请输入 RDF 数据')
       return
     }
 
@@ -20,10 +20,19 @@ export default function RdfManager() {
     setImportResult(null)
 
     try {
+      // 自动检测内容格式
+      const trimmed = turtleData.trim()
+      let contentType = 'text/turtle' // 默认
+      if (trimmed.startsWith('<?xml') || trimmed.startsWith('<rdf:RDF')) {
+        contentType = 'application/rdf+xml'
+      } else if (trimmed.startsWith('{')) {
+        contentType = 'application/ld+json'
+      }
+
       const response = await fetch('/api/rdf/import', {
         method: 'POST',
         headers: {
-          'Content-Type': 'text/turtle',
+          'Content-Type': contentType,
         },
         body: turtleData,
       })
@@ -140,13 +149,13 @@ export default function RdfManager() {
       <div className="container">
         {/* 左侧：导入面板 */}
         <div className="panel import-panel">
-          <h3>导入 Turtle 数据</h3>
+          <h3>导入 RDF 数据 (Turtle/RDF-XML/JSON-LD)</h3>
 
           <div className="textarea-wrapper">
             <textarea
               value={turtleData}
               onChange={(e) => setTurtleData(e.target.value)}
-              placeholder="输入 Turtle 格式数据或点击 '加载示例'..."
+              placeholder="输入 RDF 数据 (支持 Turtle、RDF/XML、JSON-LD 格式)..."
               rows="15"
               className="turtle-input"
             />

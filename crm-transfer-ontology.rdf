@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CRM过户业务本体 - 业务专属命名空间: http://example.com/crm/transfer# -->
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:crm="http://example.com/crm/transfer#"
+    xml:base="http://example.com/crm/transfer">
+
+    <!-- ============================================== -->
+    <!-- 1. 本体元信息声明 -->
+    <!-- 定义本体的唯一标识、名称和描述，用于区分不同领域本体 -->
+    <!-- ============================================== -->
+    <owl:Ontology rdf:about="http://example.com/crm/transfer">
+        <rdfs:label>CRM过户业务本体</rdfs:label>
+        <rdfs:comment>
+            基于CRM过户业务流程构建的领域本体，完整覆盖"客户定位→目标客户核对→电子签名→订单概要展示"全流程，
+            包含业务主体、流程步骤、验证方式、业务规则等核心概念，支持语义推理和业务流程自动化。
+        </rdfs:comment>
+        <!-- 本体版本号，便于迭代管理 -->
+        <owl:versionInfo>1.0</owl:versionInfo>
+    </owl:Ontology>
+
+    <!-- ============================================== -->
+    <!-- 2. 核心类（Class）定义 -->
+    <!-- 对应业务中的核心实体/概念，采用类继承关系优化概念层级 -->
+    <!-- ============================================== -->
+
+    <!-- 2.1 业务主体类：过户业务的参与对象 -->
+    <!-- 客户总类：抽象所有客户的共性（原客户和目标客户的父类） -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#Customer">
+        <rdfs:label>客户</rdfs:label>
+        <rdfs:comment>过户业务的参与主体，包含原客户（过户发起方）和目标客户（过户接收方）的共性属性</rdfs:comment>
+    </owl:Class>
+
+    <!-- 原客户类：继承自客户，特指发起过户的业务归属者 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#OriginalCustomer">
+        <rdfs:label>原客户</rdfs:label>
+        <rdfs:comment>发起过户操作的原业务所有者，需满足身份验证、无欠费、无在途单等约束</rdfs:comment>
+        <!-- 继承客户类的属性 -->
+        <rdfs:subClassOf rdf:resource="http://example.com/crm/transfer#Customer"/>
+    </owl:Class>
+
+    <!-- 目标客户类：继承自客户，特指接收过户的对象 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TargetCustomer">
+        <rdfs:label>目标客户</rdfs:label>
+        <rdfs:comment>接收过户业务的目标对象，需在"目标客户核对"步骤中提供有效信息</rdfs:comment>
+        <!-- 继承客户类的属性 -->
+        <rdfs:subClassOf rdf:resource="http://example.com/crm/transfer#Customer"/>
+    </owl:Class>
+
+    <!-- 过户订单类：电子签名后生成的业务凭证 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferOrder">
+        <rdfs:label>过户订单</rdfs:label>
+        <rdfs:comment>电子签名确认后通过订单创建接口生成的业务订单，包含订单号、新旧客户信息等核心字段</rdfs:comment>
+    </owl:Class>
+
+    <!-- 2.2 流程相关类：描述业务流程的结构和步骤 -->
+    <!-- 过户业务流程总类：代表一次完整的过户操作实例 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferProcess">
+        <rdfs:label>过户业务流程</rdfs:label>
+        <rdfs:comment>一次完整的CRM过户业务实例，包含4个有序步骤，关联原客户、目标客户和订单</rdfs:comment>
+    </owl:Class>
+
+    <!-- 流程步骤类：所有具体步骤的抽象父类 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#ProcessStep">
+        <rdfs:label>流程步骤</rdfs:label>
+        <rdfs:comment>过户业务的关键操作步骤，通过个体实例化具体步骤（客户定位、核对等）</rdfs:comment>
+    </owl:Class>
+
+    <!-- 2.3 验证方式类：客户定位阶段的身份验证方式 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#VerificationMethod">
+        <rdfs:label>验证方式</rdfs:label>
+        <rdfs:comment>客户定位阶段用于确认原客户身份的方式，分为人证比对和短信验证两种</rdfs:comment>
+    </owl:Class>
+
+    <!-- 2.4 业务规则类：约束过户流程的业务条件 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#BusinessRule">
+        <rdfs:label>业务规则</rdfs:label>
+        <rdfs:comment>过户业务必须遵守的约束条件，当前包含"用户欠费"和"存在在途单"两条核心规则</rdfs:comment>
+    </owl:Class>
+
+    <!-- ============================================== -->
+    <!-- 3. 个体（NamedIndividual）定义 -->
+    <!-- 实例化具体的步骤、验证方式、业务规则（相当于枚举值） -->
+    <!-- ============================================== -->
+
+    <!-- 3.1 流程步骤个体：4个关键业务步骤 -->
+    <!-- 客户定位步骤：流程第一步，负责原客户身份定位和验证 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#CustomerLocation">
+        <!-- 属于流程步骤类 -->
+        <rdf:type rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+        <rdfs:label>客户定位</rdfs:label>
+        <rdfs:comment>过户流程第一步：输入原客户身份证/业务号码，通过对应验证方式确认身份</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 目标客户核对步骤：流程第二步，验证目标客户信息 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#TargetCustomerVerification">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+        <rdfs:label>过户目标客户核对</rdfs:label>
+        <rdfs:comment>过户流程第二步：客户定位成功后，录入并核对目标客户信息</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 电子签名步骤：流程第三步，生成免填单并签名 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#ElectronicSignature">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+        <rdfs:label>电子签名</rdfs:label>
+        <rdfs:comment>过户流程第三步：展示电子免填单，客户签名后调用订单创建接口</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 订单概要展示步骤：流程第四步，展示订单信息 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#OrderSummaryDisplay">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+        <rdfs:label>订单概要信息展示</rdfs:label>
+        <rdfs:comment>过户流程第四步：订单创建成功后，展示订单号、新旧客户信息供客户查看</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 3.2 验证方式个体：两种身份验证方式 -->
+    <!-- 人证比对验证：输入身份证时使用 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#IDCardVerification">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#VerificationMethod"/>
+        <rdfs:label>人证比对验证</rdfs:label>
+        <rdfs:comment>原客户输入身份证号码时，调用"人证比对接口"进行身份验证</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 短信验证码验证：输入业务号码时使用 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#SMSVerification">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#VerificationMethod"/>
+        <rdfs:label>短信验证码验证</rdfs:label>
+        <rdfs:comment>原客户输入业务号码（手机号）时，调用"短信发送接口"，客户输入验证码完成验证</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 3.3 业务规则个体：两条核心约束规则 -->
+    <!-- 用户欠费规则：原客户存在欠费时影响过户 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#ArrearsRule">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#BusinessRule"/>
+        <rdfs:label>用户欠费规则</rdfs:label>
+        <rdfs:comment>约束规则：若原客户存在未缴欠费，过户流程可能无法继续（可扩展为阻断规则）</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- 存在在途单规则：原客户有未完成业务时影响过户 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#PendingOrderRule">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#BusinessRule"/>
+        <rdfs:label>存在在途单规则</rdfs:label>
+        <rdfs:comment>约束规则：若原客户存在未完成的在途业务单，过户流程可能无法继续（可扩展为阻断规则）</rdfs:comment>
+    </owl:NamedIndividual>
+
+    <!-- ============================================== -->
+    <!-- 4. 属性（Property）定义 -->
+    <!-- 分为对象属性（关联类/个体）和数据属性（描述属性值） -->
+    <!-- ============================================== -->
+
+    <!-- 4.1 对象属性（ObjectProperty）：关联两个类/个体 -->
+    <!-- 4.1.1 流程与步骤关联：流程包含多个步骤 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#hasProcessStep">
+        <rdfs:label>包含流程步骤</rdfs:label>
+        <rdfs:comment>描述"过户业务流程"与"流程步骤"的关联：一个流程包含多个有序步骤</rdfs:comment>
+        <!-- 属性所属的类（定义域） -->
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <!-- 属性取值的类（值域） -->
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.2 步骤顺序关联：定义步骤的前置关系 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#hasPredecessorStep">
+        <rdfs:label>前置步骤</rdfs:label>
+        <rdfs:comment>描述流程步骤的先后顺序：如"目标客户核对"的前置步骤是"客户定位"</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#ProcessStep"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.3 步骤与验证方式关联：客户定位步骤使用的验证方式 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#usesVerificationMethod">
+        <rdfs:label>使用验证方式</rdfs:label>
+        <rdfs:comment>仅"客户定位"步骤使用，关联具体的验证方式（人证比对/短信验证）</rdfs:comment>
+        <!-- 仅客户定位步骤可用 -->
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#CustomerLocation"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#VerificationMethod"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.4 流程与客户关联：流程关联原客户 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#relatesOriginalCustomer">
+        <rdfs:label>关联原客户</rdfs:label>
+        <rdfs:comment>一个过户流程对应一个原客户（发起方）</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#OriginalCustomer"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.5 流程与客户关联：流程关联目标客户 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#relatesTargetCustomer">
+        <rdfs:label>关联目标客户</rdfs:label>
+        <rdfs:comment>一个过户流程对应一个目标客户（接收方）</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#TargetCustomer"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.6 流程与订单关联：流程生成订单 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#generatesTransferOrder">
+        <rdfs:label>生成过户订单</rdfs:label>
+        <rdfs:comment>电子签名完成后，流程调用订单创建接口生成过户订单</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#TransferOrder"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.7 流程与规则关联：流程受规则约束 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#isConstrainedBy">
+        <rdfs:label>受业务规则约束</rdfs:label>
+        <rdfs:comment>一个过户流程需遵守所有核心业务规则（欠费、在途单）</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#BusinessRule"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.8 订单与客户关联：订单包含原客户信息 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#includesOriginalCustomer">
+        <rdfs:label>包含原客户信息</rdfs:label>
+        <rdfs:comment>过户订单中记录的原客户核心信息（用于概要展示）</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferOrder"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#OriginalCustomer"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.1.9 订单与客户关联：订单包含目标客户信息 -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#includesTargetCustomer">
+        <rdfs:label>包含目标客户信息</rdfs:label>
+        <rdfs:comment>过户订单中记录的目标客户核心信息（用于概要展示）</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferOrder"/>
+        <rdfs:range rdf:resource="http://example.com/crm/transfer#TargetCustomer"/>
+    </owl:ObjectProperty>
+
+    <!-- 4.2 数据属性（DatatypeProperty）：描述类的具体属性值 -->
+    <!-- 4.2.1 客户属性：身份证号码 -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasIDCardNumber">
+        <rdfs:label>身份证号码</rdfs:label>
+        <rdfs:comment>客户的唯一身份标识，原客户输入后用于人证比对验证</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#Customer"/>
+        <!-- 字符串类型 -->
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <!-- 4.2.2 客户属性：业务号码（手机号） -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasBusinessNumber">
+        <rdfs:label>业务号码</rdfs:label>
+        <rdfs:comment>客户办理业务时使用的手机号，原客户输入后用于短信验证码验证</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#Customer"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <!-- 4.2.3 订单属性：订单号 -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasOrderNumber">
+        <rdfs:label>订单号</rdfs:label>
+        <rdfs:comment>过户订单的唯一标识，用于查询和展示</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#TransferOrder"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <!-- 4.2.4 验证属性：短信验证码 -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasSMSCode">
+        <rdfs:label>短信验证码</rdfs:label>
+        <rdfs:comment>短信验证时发送给原客户的6位数字验证码，用于确认身份</rdfs:comment>
+        <!-- 仅短信验证可用 -->
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#SMSVerification"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <!-- 4.2.5 原客户属性：欠费状态 -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasArrearsStatus">
+        <rdfs:label>欠费状态</rdfs:label>
+        <rdfs:comment>原客户是否存在未缴欠费（true=欠费，false=无欠费），关联"用户欠费规则"</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#OriginalCustomer"/>
+        <!-- 布尔类型 -->
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <!-- 4.2.6 原客户属性：在途单状态 -->
+    <owl:DatatypeProperty rdf:about="http://example.com/crm/transfer#hasPendingOrderStatus">
+        <rdfs:label>在途单状态</rdfs:label>
+        <rdfs:comment>原客户是否存在未完成在途单（true=存在，false=不存在），关联"存在在途单规则"</rdfs:comment>
+        <rdfs:domain rdf:resource="http://example.com/crm/transfer#OriginalCustomer"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <!-- ============================================== -->
+    <!-- 5. 业务约束公理（Axiom）：定义业务逻辑和规则 -->
+    <!-- 基于OWL的约束语法，实现流程顺序、验证方式映射、规则约束等 -->
+    <!-- ============================================== -->
+
+    <!-- 5.1 流程步骤顺序约束：定义4个步骤的先后关系 -->
+    <!-- 客户定位：无前置步骤（流程第一步） -->
+    <rdf:Description rdf:about="http://example.com/crm/transfer#CustomerLocation">
+        <!-- 无前置步骤 -->
+        <crm:hasPredecessorStep rdf:resource="http://www.w3.org/2002/07/owl#Nothing"/>
+    </rdf:Description>
+
+    <!-- 目标客户核对：前置步骤=客户定位 -->
+    <rdf:Description rdf:about="http://example.com/crm/transfer#TargetCustomerVerification">
+        <crm:hasPredecessorStep rdf:resource="http://example.com/crm/transfer#CustomerLocation"/>
+    </rdf:Description>
+
+    <!-- 电子签名：前置步骤=目标客户核对 -->
+    <rdf:Description rdf:about="http://example.com/crm/transfer#ElectronicSignature">
+        <crm:hasPredecessorStep rdf:resource="http://example.com/crm/transfer#TargetCustomerVerification"/>
+    </rdf:Description>
+
+    <!-- 订单概要展示：前置步骤=电子签名 -->
+    <rdf:Description rdf:about="http://example.com/crm/transfer#OrderSummaryDisplay">
+        <crm:hasPredecessorStep rdf:resource="http://example.com/crm/transfer#ElectronicSignature"/>
+    </rdf:Description>
+
+    <!-- ============================================== -->
+    <!-- 6. 示例实例（可选）：展示一个完整的过户流程实例 -->
+    <!-- 用于测试本体的合理性和推理效果 -->
+    <!-- ============================================== -->
+    <!-- 原客户实例：无欠费、无在途单，提供身份证号 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#OriginalCustomer_001">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#OriginalCustomer"/>
+        <crm:hasIDCardNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">110101199001011234</crm:hasIDCardNumber>
+        <crm:hasBusinessNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">13800138000</crm:hasBusinessNumber>
+        <crm:hasArrearsStatus rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</crm:hasArrearsStatus>
+        <crm:hasPendingOrderStatus rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</crm:hasPendingOrderStatus>
+    </owl:NamedIndividual>
+
+    <!-- 目标客户实例 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#TargetCustomer_001">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#TargetCustomer"/>
+        <crm:hasIDCardNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">110101199505055678</crm:hasIDCardNumber>
+        <crm:hasBusinessNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">13900139000</crm:hasBusinessNumber>
+    </owl:NamedIndividual>
+
+    <!-- 过户订单实例 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#TransferOrder_001">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#TransferOrder"/>
+        <crm:hasOrderNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CRM_TRANS_20251203_001</crm:hasOrderNumber>
+        <crm:includesOriginalCustomer rdf:resource="http://example.com/crm/transfer#OriginalCustomer_001"/>
+        <crm:includesTargetCustomer rdf:resource="http://example.com/crm/transfer#TargetCustomer_001"/>
+    </owl:NamedIndividual>
+
+    <!-- 过户流程实例：关联所有实体，完整流程 -->
+    <owl:NamedIndividual rdf:about="http://example.com/crm/transfer#TransferProcess_001">
+        <rdf:type rdf:resource="http://example.com/crm/transfer#TransferProcess"/>
+        <crm:relatesOriginalCustomer rdf:resource="http://example.com/crm/transfer#OriginalCustomer_001"/>
+        <crm:relatesTargetCustomer rdf:resource="http://example.com/crm/transfer#TargetCustomer_001"/>
+        <crm:generatesTransferOrder rdf:resource="http://example.com/crm/transfer#TransferOrder_001"/>
+        <crm:hasProcessStep rdf:resource="http://example.com/crm/transfer#CustomerLocation"/>
+        <crm:hasProcessStep rdf:resource="http://example.com/crm/transfer#TargetCustomerVerification"/>
+        <crm:hasProcessStep rdf:resource="http://example.com/crm/transfer#ElectronicSignature"/>
+        <crm:hasProcessStep rdf:resource="http://example.com/crm/transfer#OrderSummaryDisplay"/>
+        <!-- 因提供身份证 -->
+        <crm:usesVerificationMethod rdf:resource="http://example.com/crm/transfer#IDCardVerification"/>
+        <crm:isConstrainedBy rdf:resource="http://example.com/crm/transfer#ArrearsRule"/>
+        <crm:isConstrainedBy rdf:resource="http://example.com/crm/transfer#PendingOrderRule"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
