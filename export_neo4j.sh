@@ -26,29 +26,56 @@ echo "  节点数量: $NODE_COUNT"
 echo "  关系数量: $REL_COUNT"
 echo ""
 
-# 导出所有数据为简单的 JSON 格式
+# 导出节点为 CREATE 语句
 echo "📦 正在导出所有数据..."
-docker exec neo4j cypher-shell -u neo4j -p neo4j_test_pass \
-"MATCH (n) RETURN n" --format plain > "$NODES_FILE.tmp"
 
-docker exec neo4j cypher-shell -u neo4j -p neo4j_test_pass \
-"MATCH (a)-[r]->(b) RETURN a.iri as from_iri, type(r) as rel_type, b.iri as to_iri" \
---format plain > "$RELS_FILE.tmp"
-
-# 清理格式
 echo "// 节点创建语句" > "$NODES_FILE"
 echo "// 执行此脚本前请确保数据库为空" >> "$NODES_FILE"
 echo "" >> "$NODES_FILE"
 
+# 使用 APOC 或原生 Cypher 生成 CREATE 语句
+docker exec neo4j cypher-shell -u neo4j -p neo4j_test_pass --format plain << 'CYPHER' >> "$NODES_FILE"
+MATCH (n)
+WITH n, 
+     labels(n) as lbls, 
+     [key IN keys(n) | key + ': ' + 
+       CASE 
+         WHEN n[key] =~ '^http.*' THEN '"' + n[key] + '"'
+         WHEN toString(n[key]) =~ '^[0-9]+$' THEN toString(n[key])
+         WHEN toString(n[key]) IN ['true', 'false'] THEN toString(n[key])
+         ELSE '"' + replace(replace(toString(n[key]), '\\', '\\\\'), '"', '\\"') + '"'
+       END
+     ] as propStrs
+RETURN 'CREATE (' + 
+       CASE WHEN size(lbls) > 0 THEN reduce(s = '', lbl IN lbls | s + ':' + lbl) ELSE '' END +
+       CASE WHEN size(propStrs) > 0 THEN ' {' + reduce(s = '', i IN range(0, size(propStrs)-1) | 
+         s + CASE WHEN i > 0 THEN ', ' ELSE '' END + propStrs[i]) + '}' ELSE '' END +
+       ');' as statement;
+CYPHER
+
+# 导出关系为 MATCH...CREATE 语句
 echo "// 关系创建语句" > "$RELS_FILE"
 echo "// 请先执行 01_nodes.cypher" >> "$RELS_FILE"
 echo "" >> "$RELS_FILE"
 
-# 提取实际数据行
-tail -n +2 "$NODES_FILE.tmp" >> "$NODES_FILE"
-tail -n +2 "$RELS_FILE.tmp" >> "$RELS_FILE"
-
-rm -f "$NODES_FILE.tmp" "$RELS_FILE.tmp"
+docker exec neo4j cypher-shell -u neo4j -p neo4j_test_pass --format plain << 'CYPHER' >> "$RELS_FILE"
+MATCH (a)-[r]->(b)
+WITH a, r, b, type(r) as relType,
+     [key IN keys(r) | key + ': ' + 
+       CASE 
+         WHEN r[key] =~ '^http.*' THEN '"' + r[key] + '"'
+         WHEN toString(r[key]) =~ '^[0-9]+$' THEN toString(r[key])
+         WHEN toString(r[key]) IN ['true', 'false'] THEN toString(r[key])
+         ELSE '"' + replace(replace(toString(r[key]), '\\', '\\\\'), '"', '\\"') + '"'
+       END
+     ] as propStrs
+WHERE a.iri IS NOT NULL AND b.iri IS NOT NULL
+RETURN 'MATCH (a {iri: "' + a.iri + '"}), (b {iri: "' + b.iri + '"}) ' +
+       'CREATE (a)-[r:' + relType + 
+       CASE WHEN size(propStrs) > 0 THEN ' {' + reduce(s = '', i IN range(0, size(propStrs)-1) | 
+         s + CASE WHEN i > 0 THEN ', ' ELSE '' END + propStrs[i]) + '}' ELSE '' END +
+       ']->(b);' as statement;
+CYPHER
 
 echo ""
 echo "✅ 导出完成!"

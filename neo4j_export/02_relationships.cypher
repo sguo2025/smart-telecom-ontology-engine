@@ -1,99 +1,291 @@
 // 关系创建语句
 // 请先执行 01_nodes.cypher
 
-"http://example.com/crm/transfer#TransferOrder", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#hasArrearsStatus", "RANGE", "http://www.w3.org/2001/XMLSchema#boolean"
-"http://example.com/crm/transfer#hasArrearsStatus", "DOMAIN", "http://example.com/crm/transfer#OriginalCustomer"
-"http://example.com/crm/transfer#hasArrearsStatus", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#ProcessStep", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#SMSVerification", "TYPE", "http://example.com/crm/transfer#VerificationMethod"
-"http://example.com/crm/transfer#SMSVerification", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#PendingOrderRule", "TYPE", "http://example.com/crm/transfer#BusinessRule"
-"http://example.com/crm/transfer#PendingOrderRule", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#relatesOriginalCustomer", "RANGE", "http://example.com/crm/transfer#OriginalCustomer"
-"http://example.com/crm/transfer#relatesOriginalCustomer", "DOMAIN", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#relatesOriginalCustomer", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer", "TYPE", "http://www.w3.org/2002/07/owl#Ontology"
-"http://example.com/crm/transfer#isConstrainedBy", "RANGE", "http://example.com/crm/transfer#BusinessRule"
-"http://example.com/crm/transfer#isConstrainedBy", "DOMAIN", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#isConstrainedBy", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#IDCardVerification", "TYPE", "http://example.com/crm/transfer#VerificationMethod"
-"http://example.com/crm/transfer#IDCardVerification", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#relatesTargetCustomer", "RANGE", "http://example.com/crm/transfer#TargetCustomer"
-"http://example.com/crm/transfer#relatesTargetCustomer", "DOMAIN", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#relatesTargetCustomer", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#hasOrderNumber", "RANGE", "http://www.w3.org/2001/XMLSchema#string"
-"http://example.com/crm/transfer#hasOrderNumber", "DOMAIN", "http://example.com/crm/transfer#TransferOrder"
-"http://example.com/crm/transfer#hasOrderNumber", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#TargetCustomerVerification", "HASPREDECESSORSTEP", "http://example.com/crm/transfer#CustomerLocation"
-"http://example.com/crm/transfer#TargetCustomerVerification", "TYPE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#TargetCustomerVerification", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#includesOriginalCustomer", "RANGE", "http://example.com/crm/transfer#OriginalCustomer"
-"http://example.com/crm/transfer#includesOriginalCustomer", "DOMAIN", "http://example.com/crm/transfer#TransferOrder"
-"http://example.com/crm/transfer#includesOriginalCustomer", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#hasProcessStep", "RANGE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#hasProcessStep", "DOMAIN", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#hasProcessStep", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#includesTargetCustomer", "RANGE", "http://example.com/crm/transfer#TargetCustomer"
-"http://example.com/crm/transfer#includesTargetCustomer", "DOMAIN", "http://example.com/crm/transfer#TransferOrder"
-"http://example.com/crm/transfer#includesTargetCustomer", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#hasBusinessNumber", "RANGE", "http://www.w3.org/2001/XMLSchema#string"
-"http://example.com/crm/transfer#hasBusinessNumber", "DOMAIN", "http://example.com/crm/transfer#Customer"
-"http://example.com/crm/transfer#hasBusinessNumber", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#OriginalCustomer_001", "TYPE", "http://example.com/crm/transfer#OriginalCustomer"
-"http://example.com/crm/transfer#OriginalCustomer_001", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#usesVerificationMethod", "RANGE", "http://example.com/crm/transfer#VerificationMethod"
-"http://example.com/crm/transfer#usesVerificationMethod", "DOMAIN", "http://example.com/crm/transfer#CustomerLocation"
-"http://example.com/crm/transfer#usesVerificationMethod", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#OrderSummaryDisplay", "HASPREDECESSORSTEP", "http://example.com/crm/transfer#ElectronicSignature"
-"http://example.com/crm/transfer#OrderSummaryDisplay", "TYPE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#OrderSummaryDisplay", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#hasPendingOrderStatus", "RANGE", "http://www.w3.org/2001/XMLSchema#boolean"
-"http://example.com/crm/transfer#hasPendingOrderStatus", "DOMAIN", "http://example.com/crm/transfer#OriginalCustomer"
-"http://example.com/crm/transfer#hasPendingOrderStatus", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#hasSMSCode", "RANGE", "http://www.w3.org/2001/XMLSchema#string"
-"http://example.com/crm/transfer#hasSMSCode", "DOMAIN", "http://example.com/crm/transfer#SMSVerification"
-"http://example.com/crm/transfer#hasSMSCode", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#TargetCustomer_001", "TYPE", "http://example.com/crm/transfer#TargetCustomer"
-"http://example.com/crm/transfer#TargetCustomer_001", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#TransferOrder_001", "INCLUDESTARGETCUSTOMER", "http://example.com/crm/transfer#TargetCustomer_001"
-"http://example.com/crm/transfer#TransferOrder_001", "INCLUDESORIGINALCUSTOMER", "http://example.com/crm/transfer#OriginalCustomer_001"
-"http://example.com/crm/transfer#TransferOrder_001", "TYPE", "http://example.com/crm/transfer#TransferOrder"
-"http://example.com/crm/transfer#TransferOrder_001", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#TargetCustomer", "SUBCLASSOF", "http://example.com/crm/transfer#Customer"
-"http://example.com/crm/transfer#TargetCustomer", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#Customer", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#generatesTransferOrder", "RANGE", "http://example.com/crm/transfer#TransferOrder"
-"http://example.com/crm/transfer#generatesTransferOrder", "DOMAIN", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#generatesTransferOrder", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#hasPredecessorStep", "RANGE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#hasPredecessorStep", "DOMAIN", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#hasPredecessorStep", "TYPE", "http://www.w3.org/2002/07/owl#ObjectProperty"
-"http://example.com/crm/transfer#BusinessRule", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#CustomerLocation", "HASPREDECESSORSTEP", "http://www.w3.org/2002/07/owl#Nothing"
-"http://example.com/crm/transfer#CustomerLocation", "TYPE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#CustomerLocation", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#ArrearsRule", "TYPE", "http://example.com/crm/transfer#BusinessRule"
-"http://example.com/crm/transfer#ArrearsRule", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#VerificationMethod", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#TransferProcess", "TYPE", "http://www.w3.org/2002/07/owl#Class"
-"http://example.com/crm/transfer#hasIDCardNumber", "RANGE", "http://www.w3.org/2001/XMLSchema#string"
-"http://example.com/crm/transfer#hasIDCardNumber", "DOMAIN", "http://example.com/crm/transfer#Customer"
-"http://example.com/crm/transfer#hasIDCardNumber", "TYPE", "http://www.w3.org/2002/07/owl#DatatypeProperty"
-"http://example.com/crm/transfer#ElectronicSignature", "HASPREDECESSORSTEP", "http://example.com/crm/transfer#TargetCustomerVerification"
-"http://example.com/crm/transfer#ElectronicSignature", "TYPE", "http://example.com/crm/transfer#ProcessStep"
-"http://example.com/crm/transfer#ElectronicSignature", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#TransferProcess_001", "TYPE", "http://www.w3.org/2002/07/owl#NamedIndividual"
-"http://example.com/crm/transfer#TransferProcess_001", "RELATESORIGINALCUSTOMER", "http://example.com/crm/transfer#OriginalCustomer_001"
-"http://example.com/crm/transfer#TransferProcess_001", "HASPROCESSSTEP", "http://example.com/crm/transfer#CustomerLocation"
-"http://example.com/crm/transfer#TransferProcess_001", "GENERATESTRANSFERORDER", "http://example.com/crm/transfer#TransferOrder_001"
-"http://example.com/crm/transfer#TransferProcess_001", "HASPROCESSSTEP", "http://example.com/crm/transfer#TargetCustomerVerification"
-"http://example.com/crm/transfer#TransferProcess_001", "RELATESTARGETCUSTOMER", "http://example.com/crm/transfer#TargetCustomer_001"
-"http://example.com/crm/transfer#TransferProcess_001", "ISCONSTRAINEDBY", "http://example.com/crm/transfer#ArrearsRule"
-"http://example.com/crm/transfer#TransferProcess_001", "HASPROCESSSTEP", "http://example.com/crm/transfer#ElectronicSignature"
-"http://example.com/crm/transfer#TransferProcess_001", "USESVERIFICATIONMETHOD", "http://example.com/crm/transfer#IDCardVerification"
-"http://example.com/crm/transfer#TransferProcess_001", "TYPE", "http://example.com/crm/transfer#TransferProcess"
-"http://example.com/crm/transfer#TransferProcess_001", "HASPROCESSSTEP", "http://example.com/crm/transfer#OrderSummaryDisplay"
-"http://example.com/crm/transfer#TransferProcess_001", "ISCONSTRAINEDBY", "http://example.com/crm/transfer#PendingOrderRule"
-"http://example.com/crm/transfer#OriginalCustomer", "SUBCLASSOF", "http://example.com/crm/transfer#Customer"
-"http://example.com/crm/transfer#OriginalCustomer", "TYPE", "http://www.w3.org/2002/07/owl#Class"
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomerVerification"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomerVerification"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomerVerification"}), (b {iri: "http://example.com/crm/transfer#CustomerLocation"})
+CREATE (a)-[:HASPREDECESSORSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#usesVerificationMethod"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#usesVerificationMethod"}), (b {iri: "http://example.com/crm/transfer#CustomerLocation"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#usesVerificationMethod"}), (b {iri: "http://example.com/crm/transfer#VerificationMethod"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#VerificationMethod"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasSMSCode"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasSMSCode"}), (b {iri: "http://example.com/crm/transfer#SMSVerification"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasSMSCode"}), (b {iri: "http://www.w3.org/2001/XMLSchema#string"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPendingOrderStatus"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPendingOrderStatus"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPendingOrderStatus"}), (b {iri: "http://www.w3.org/2001/XMLSchema#boolean"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ElectronicSignature"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ElectronicSignature"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ElectronicSignature"}), (b {iri: "http://example.com/crm/transfer#TargetCustomerVerification"})
+CREATE (a)-[:HASPREDECESSORSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesTargetCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesTargetCustomer"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesTargetCustomer"}), (b {iri: "http://example.com/crm/transfer#TargetCustomer"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OriginalCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OriginalCustomer"}), (b {iri: "http://example.com/crm/transfer#Customer"})
+CREATE (a)-[:SUBCLASSOF]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferOrder"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#isConstrainedBy"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#isConstrainedBy"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#isConstrainedBy"}), (b {iri: "http://example.com/crm/transfer#BusinessRule"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasBusinessNumber"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasBusinessNumber"}), (b {iri: "http://example.com/crm/transfer#Customer"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasBusinessNumber"}), (b {iri: "http://www.w3.org/2001/XMLSchema#string"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferOrder_001"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferOrder_001"}), (b {iri: "http://example.com/crm/transfer#TransferOrder"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferOrder_001"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer_001"})
+CREATE (a)-[:INCLUDESORIGINALCUSTOMER]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferOrder_001"}), (b {iri: "http://example.com/crm/transfer#TargetCustomer_001"})
+CREATE (a)-[:INCLUDESTARGETCUSTOMER]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ArrearsRule"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ArrearsRule"}), (b {iri: "http://example.com/crm/transfer#BusinessRule"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OriginalCustomer_001"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OriginalCustomer_001"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#Customer"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OrderSummaryDisplay"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OrderSummaryDisplay"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#OrderSummaryDisplay"}), (b {iri: "http://example.com/crm/transfer#ElectronicSignature"})
+CREATE (a)-[:HASPREDECESSORSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#generatesTransferOrder"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#generatesTransferOrder"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#generatesTransferOrder"}), (b {iri: "http://example.com/crm/transfer#TransferOrder"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#PendingOrderRule"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#PendingOrderRule"}), (b {iri: "http://example.com/crm/transfer#BusinessRule"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer"}), (b {iri: "http://www.w3.org/2002/07/owl#Ontology"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesOriginalCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesOriginalCustomer"}), (b {iri: "http://example.com/crm/transfer#TransferOrder"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesOriginalCustomer"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomer_001"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomer_001"}), (b {iri: "http://example.com/crm/transfer#TargetCustomer"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#SMSVerification"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#SMSVerification"}), (b {iri: "http://example.com/crm/transfer#VerificationMethod"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#BusinessRule"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasArrearsStatus"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasArrearsStatus"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasArrearsStatus"}), (b {iri: "http://www.w3.org/2001/XMLSchema#boolean"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPredecessorStep"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPredecessorStep"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasPredecessorStep"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#PendingOrderRule"})
+CREATE (a)-[:ISCONSTRAINEDBY]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#OrderSummaryDisplay"})
+CREATE (a)-[:HASPROCESSSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#IDCardVerification"})
+CREATE (a)-[:USESVERIFICATIONMETHOD]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#ElectronicSignature"})
+CREATE (a)-[:HASPROCESSSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#ArrearsRule"})
+CREATE (a)-[:ISCONSTRAINEDBY]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#TargetCustomer_001"})
+CREATE (a)-[:RELATESTARGETCUSTOMER]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#TargetCustomerVerification"})
+CREATE (a)-[:HASPROCESSSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#TransferOrder_001"})
+CREATE (a)-[:GENERATESTRANSFERORDER]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#CustomerLocation"})
+CREATE (a)-[:HASPROCESSSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer_001"})
+CREATE (a)-[:RELATESORIGINALCUSTOMER]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TransferProcess_001"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesOriginalCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesOriginalCustomer"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#relatesOriginalCustomer"}), (b {iri: "http://example.com/crm/transfer#OriginalCustomer"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#IDCardVerification"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#IDCardVerification"}), (b {iri: "http://example.com/crm/transfer#VerificationMethod"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#CustomerLocation"}), (b {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#CustomerLocation"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#CustomerLocation"}), (b {iri: "http://www.w3.org/2002/07/owl#Nothing"})
+CREATE (a)-[:HASPREDECESSORSTEP]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasIDCardNumber"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasIDCardNumber"}), (b {iri: "http://example.com/crm/transfer#Customer"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasIDCardNumber"}), (b {iri: "http://www.w3.org/2001/XMLSchema#string"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasOrderNumber"}), (b {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasOrderNumber"}), (b {iri: "http://example.com/crm/transfer#TransferOrder"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasOrderNumber"}), (b {iri: "http://www.w3.org/2001/XMLSchema#string"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#ProcessStep"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasProcessStep"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasProcessStep"}), (b {iri: "http://example.com/crm/transfer#TransferProcess"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#hasProcessStep"}), (b {iri: "http://example.com/crm/transfer#ProcessStep"})
+CREATE (a)-[:RANGE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#Class"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#TargetCustomer"}), (b {iri: "http://example.com/crm/transfer#Customer"})
+CREATE (a)-[:SUBCLASSOF]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesTargetCustomer"}), (b {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
+CREATE (a)-[:TYPE]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesTargetCustomer"}), (b {iri: "http://example.com/crm/transfer#TransferOrder"})
+CREATE (a)-[:DOMAIN]->(b);
+
+MATCH (a {iri: "http://example.com/crm/transfer#includesTargetCustomer"}), (b {iri: "http://example.com/crm/transfer#TargetCustomer"})
+CREATE (a)-[:RANGE]->(b);
+

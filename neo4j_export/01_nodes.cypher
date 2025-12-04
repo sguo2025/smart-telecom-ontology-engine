@@ -1,50 +1,47 @@
 // 节点创建语句
 // 执行此脚本前请确保数据库为空
 
-(:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#TargetCustomerVerification", comment: "过户流程第二步：客户定位成功后，录入并核对目标客户信息", label: "过户目标客户核对"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#usesVerificationMethod", comment: "仅\"客户定位\"步骤使用，关联具体的验证方式（人证比对/短信验证）", label: "使用验证方式"})
-(:Class {iri: "http://example.com/crm/transfer#VerificationMethod", comment: "客户定位阶段用于确认原客户身份的方式，分为人证比对和短信验证两种", label: "验证方式"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasSMSCode", comment: "短信验证时发送给原客户的6位数字验证码，用于确认身份", label: "短信验证码"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasPendingOrderStatus", comment: "原客户是否存在未完成在途单（true=存在，false=不存在），关联\"存在在途单规则\"", label: "在途单状态"})
-(:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#ElectronicSignature", comment: "过户流程第三步：展示电子免填单，客户签名后调用订单创建接口", label: "电子签名"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#relatesTargetCustomer", comment: "一个过户流程对应一个目标客户（接收方）", label: "关联目标客户"})
-(:Class {iri: "http://example.com/crm/transfer#OriginalCustomer", comment: "发起过户操作的原业务所有者，需满足身份验证、无欠费、无在途单等约束", label: "原客户"})
-(:Class {iri: "http://example.com/crm/transfer#TransferOrder", comment: "电子签名确认后通过订单创建接口生成的业务订单，包含订单号、新旧客户信息等核心字段", label: "过户订单"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#isConstrainedBy", comment: "一个过户流程需遵守所有核心业务规则（欠费、在途单）", label: "受业务规则约束"})
-({iri: "http://www.w3.org/2002/07/owl#Nothing"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasBusinessNumber", comment: "客户办理业务时使用的手机号，原客户输入后用于短信验证码验证", label: "业务号码"})
-({iri: "http://www.w3.org/2002/07/owl#ObjectProperty"})
-(:NamedIndividual:TransferOrder {iri: "http://example.com/crm/transfer#TransferOrder_001", hasOrderNumber: "CRM_TRANS_20251203_001"})
-(:NamedIndividual:BusinessRule {iri: "http://example.com/crm/transfer#ArrearsRule", comment: "约束规则：若原客户存在未缴欠费，过户流程可能无法继续（可扩展为阻断规则）", label: "用户欠费规则"})
-(:Class {iri: "http://example.com/crm/transfer#TransferProcess", comment: "一次完整的CRM过户业务实例，包含4个有序步骤，关联原客户、目标客户和订单", label: "过户业务流程"})
-(:NamedIndividual:OriginalCustomer {hasBusinessNumber: "13800138000", iri: "http://example.com/crm/transfer#OriginalCustomer_001", hasPendingOrderStatus: "false", hasArrearsStatus: "false", hasIDCardNumber: "110101199001011234"})
-(:Class {iri: "http://example.com/crm/transfer#Customer", comment: "过户业务的参与主体，包含原客户（过户发起方）和目标客户（过户接收方）的共性属性", label: "客户"})
-(:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#OrderSummaryDisplay", comment: "过户流程第四步：订单创建成功后，展示订单号、新旧客户信息供客户查看", label: "订单概要信息展示"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#generatesTransferOrder", comment: "电子签名完成后，流程调用订单创建接口生成过户订单", label: "生成过户订单"})
-(:NamedIndividual:BusinessRule {iri: "http://example.com/crm/transfer#PendingOrderRule", comment: "约束规则：若原客户存在未完成的在途业务单，过户流程可能无法继续（可扩展为阻断规则）", label: "存在在途单规则"})
-(:Ontology {iri: "http://example.com/crm/transfer", comment: "
-            基于CRM过户业务流程构建的领域本体，完整覆盖\"客户定位→目标客户核对→电子签名→订单概要展示\"全流程，
-            包含业务主体、流程步骤、验证方式、业务规则等核心概念，支持语义推理和业务流程自动化。
-        ", label: "CRM过户业务本体", versionInfo: "1.0"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#includesOriginalCustomer", comment: "过户订单中记录的原客户核心信息（用于概要展示）", label: "包含原客户信息"})
-(:NamedIndividual:TargetCustomer {iri: "http://example.com/crm/transfer#TargetCustomer_001", hasBusinessNumber: "13900139000", hasIDCardNumber: "110101199505055678"})
-(:NamedIndividual:VerificationMethod {iri: "http://example.com/crm/transfer#SMSVerification", comment: "原客户输入业务号码（手机号）时，调用\"短信发送接口\"，客户输入验证码完成验证", label: "短信验证码验证"})
-(:Class {iri: "http://example.com/crm/transfer#BusinessRule", comment: "过户业务必须遵守的约束条件，当前包含\"用户欠费\"和\"存在在途单\"两条核心规则", label: "业务规则"})
-({iri: "http://www.w3.org/2002/07/owl#Class"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasArrearsStatus", comment: "原客户是否存在未缴欠费（true=欠费，false=无欠费），关联\"用户欠费规则\"", label: "欠费状态"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#hasPredecessorStep", comment: "描述流程步骤的先后顺序：如\"目标客户核对\"的前置步骤是\"客户定位\"", label: "前置步骤"})
-(:NamedIndividual:TransferProcess {iri: "http://example.com/crm/transfer#TransferProcess_001"})
-({iri: "http://www.w3.org/2001/XMLSchema#boolean"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#relatesOriginalCustomer", comment: "一个过户流程对应一个原客户（发起方）", label: "关联原客户"})
-({iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"})
-(:NamedIndividual:VerificationMethod {iri: "http://example.com/crm/transfer#IDCardVerification", comment: "原客户输入身份证号码时，调用\"人证比对接口\"进行身份验证", label: "人证比对验证"})
-(:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#CustomerLocation", comment: "过户流程第一步：输入原客户身份证/业务号码，通过对应验证方式确认身份", label: "客户定位"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasIDCardNumber", comment: "客户的唯一身份标识，原客户输入后用于人证比对验证", label: "身份证号码"})
-(:DatatypeProperty {iri: "http://example.com/crm/transfer#hasOrderNumber", comment: "过户订单的唯一标识，用于查询和展示", label: "订单号"})
-(:Class {iri: "http://example.com/crm/transfer#ProcessStep", comment: "过户业务的关键操作步骤，通过个体实例化具体步骤（客户定位、核对等）", label: "流程步骤"})
-({iri: "http://www.w3.org/2001/XMLSchema#string"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#hasProcessStep", comment: "描述\"过户业务流程\"与\"流程步骤\"的关联：一个流程包含多个有序步骤", label: "包含流程步骤"})
-(:Class {iri: "http://example.com/crm/transfer#TargetCustomer", comment: "接收过户业务的目标对象，需在\"目标客户核对\"步骤中提供有效信息", label: "目标客户"})
-(:ObjectProperty {iri: "http://example.com/crm/transfer#includesTargetCustomer", comment: "过户订单中记录的目标客户核心信息（用于概要展示）", label: "包含目标客户信息"})
-({iri: "http://www.w3.org/2002/07/owl#NamedIndividual"})
-({iri: "http://www.w3.org/2002/07/owl#Ontology"})
+CREATE (:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#TargetCustomerVerification", comment: "过户流程第二步：客户定位成功后，录入并核对目标客户信息", label: "过户目标客户核对"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#usesVerificationMethod", comment: "仅\\\"客户定位\\\"步骤使用，关联具体的验证方式（人证比对/短信验证）", label: "使用验证方式"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#VerificationMethod", comment: "客户定位阶段用于确认原客户身份的方式，分为人证比对和短信验证两种", label: "验证方式"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasSMSCode", comment: "短信验证时发送给原客户的6位数字验证码，用于确认身份", label: "短信验证码"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasPendingOrderStatus", comment: "原客户是否存在未完成在途单（true=存在，false=不存在），关联\\\"存在在途单规则\\\"", label: "在途单状态"});
+CREATE (:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#ElectronicSignature", comment: "过户流程第三步：展示电子免填单，客户签名后调用订单创建接口", label: "电子签名"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#relatesTargetCustomer", comment: "一个过户流程对应一个目标客户（接收方）", label: "关联目标客户"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#OriginalCustomer", comment: "发起过户操作的原业务所有者，需满足身份验证、无欠费、无在途单等约束", label: "原客户"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#TransferOrder", comment: "电子签名确认后通过订单创建接口生成的业务订单，包含订单号、新旧客户信息等核心字段", label: "过户订单"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#isConstrainedBy", comment: "一个过户流程需遵守所有核心业务规则（欠费、在途单）", label: "受业务规则约束"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#Nothing"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasBusinessNumber", comment: "客户办理业务时使用的手机号，原客户输入后用于短信验证码验证", label: "业务号码"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#ObjectProperty"});
+CREATE (:NamedIndividual:TransferOrder {iri: "http://example.com/crm/transfer#TransferOrder_001", hasOrderNumber: "CRM_TRANS_20251203_001"});
+CREATE (:NamedIndividual:BusinessRule {iri: "http://example.com/crm/transfer#ArrearsRule", comment: "约束规则：若原客户存在未缴欠费，过户流程可能无法继续（可扩展为阻断规则）", label: "用户欠费规则"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#TransferProcess", comment: "一次完整的CRM过户业务实例，包含4个有序步骤，关联原客户、目标客户和订单", label: "过户业务流程"});
+CREATE (:NamedIndividual:OriginalCustomer {hasBusinessNumber: "13800138000", iri: "http://example.com/crm/transfer#OriginalCustomer_001", hasPendingOrderStatus: "false", hasArrearsStatus: "false", hasIDCardNumber: "110101199001011234"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#Customer", comment: "过户业务的参与主体，包含原客户（过户发起方）和目标客户（过户接收方）的共性属性", label: "客户"});
+CREATE (:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#OrderSummaryDisplay", comment: "过户流程第四步：订单创建成功后，展示订单号、新旧客户信息供客户查看", label: "订单概要信息展示"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#generatesTransferOrder", comment: "电子签名完成后，流程调用订单创建接口生成过户订单", label: "生成过户订单"});
+CREATE (:NamedIndividual:BusinessRule {iri: "http://example.com/crm/transfer#PendingOrderRule", comment: "约束规则：若原客户存在未完成的在途业务单，过户流程可能无法继续（可扩展为阻断规则）", label: "存在在途单规则"});
+CREATE (:Ontology {iri: "http://example.com/crm/transfer", comment: ""});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#includesOriginalCustomer", comment: "过户订单中记录的原客户核心信息（用于概要展示）", label: "包含原客户信息"});
+CREATE (:NamedIndividual:TargetCustomer {iri: "http://example.com/crm/transfer#TargetCustomer_001", hasBusinessNumber: "13900139000", hasIDCardNumber: "110101199505055678"});
+CREATE (:NamedIndividual:VerificationMethod {iri: "http://example.com/crm/transfer#SMSVerification", comment: "原客户输入业务号码（手机号）时，调用\\\"短信发送接口\\\"，客户输入验证码完成验证", label: "短信验证码验证"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#BusinessRule", comment: "过户业务必须遵守的约束条件，当前包含\\\"用户欠费\\\"和\\\"存在在途单\\\"两条核心规则", label: "业务规则"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#Class"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasArrearsStatus", comment: "原客户是否存在未缴欠费（true=欠费，false=无欠费），关联\\\"用户欠费规则\\\"", label: "欠费状态"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#hasPredecessorStep", comment: "描述流程步骤的先后顺序：如\\\"目标客户核对\\\"的前置步骤是\\\"客户定位\\\"", label: "前置步骤"});
+CREATE (:NamedIndividual:TransferProcess {iri: "http://example.com/crm/transfer#TransferProcess_001"});
+CREATE ( {iri: "http://www.w3.org/2001/XMLSchema#boolean"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#relatesOriginalCustomer", comment: "一个过户流程对应一个原客户（发起方）", label: "关联原客户"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#DatatypeProperty"});
+CREATE (:NamedIndividual:VerificationMethod {iri: "http://example.com/crm/transfer#IDCardVerification", comment: "原客户输入身份证号码时，调用\\\"人证比对接口\\\"进行身份验证", label: "人证比对验证"});
+CREATE (:ProcessStep:NamedIndividual {iri: "http://example.com/crm/transfer#CustomerLocation", comment: "过户流程第一步：输入原客户身份证/业务号码，通过对应验证方式确认身份", label: "客户定位"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasIDCardNumber", comment: "客户的唯一身份标识，原客户输入后用于人证比对验证", label: "身份证号码"});
+CREATE (:DatatypeProperty {iri: "http://example.com/crm/transfer#hasOrderNumber", comment: "过户订单的唯一标识，用于查询和展示", label: "订单号"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#ProcessStep", comment: "过户业务的关键操作步骤，通过个体实例化具体步骤（客户定位、核对等）", label: "流程步骤"});
+CREATE ( {iri: "http://www.w3.org/2001/XMLSchema#string"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#hasProcessStep", comment: "描述\\\"过户业务流程\\\"与\\\"流程步骤\\\"的关联：一个流程包含多个有序步骤", label: "包含流程步骤"});
+CREATE (:Class {iri: "http://example.com/crm/transfer#TargetCustomer", comment: "接收过户业务的目标对象，需在\\\"目标客户核对\\\"步骤中提供有效信息", label: "目标客户"});
+CREATE (:ObjectProperty {iri: "http://example.com/crm/transfer#includesTargetCustomer", comment: "过户订单中记录的目标客户核心信息（用于概要展示）", label: "包含目标客户信息"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#NamedIndividual"});
+CREATE ( {iri: "http://www.w3.org/2002/07/owl#Ontology"});
