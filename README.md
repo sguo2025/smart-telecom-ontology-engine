@@ -59,6 +59,87 @@ npm run dev
 # 访问 http://localhost:8888
 ```
 
+## 部署模式配置说明
+
+项目支持两种运行模式，配置文件会根据模式自动适配：
+
+### 模式 1：本地开发模式（非容器）
+
+**适用场景**：本地 IDE 开发调试
+
+**配置**：
+- **后端** (`backend/src/main/resources/application.yml`)：
+  ```yaml
+  spring:
+    data:
+      neo4j:
+        uri: bolt://localhost:7687  # 连接本地 Neo4j
+  ```
+
+- **前端** (`frontend/vite.config.js`)：
+  ```javascript
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8080',  // 代理到本地后端
+    }
+  }
+  ```
+
+**启动步骤**：
+```bash
+# 1. 只启动 Neo4j 容器
+docker-compose up neo4j -d
+
+# 2. 启动后端（在 IDE 中 Debug 或使用 Maven）
+cd backend
+mvn spring-boot:run
+
+# 3. 启动前端
+cd frontend
+npm run dev
+```
+
+**访问地址**：
+- 前端：http://localhost:8888
+- 后端 API：http://localhost:8080/api
+- Swagger UI：http://localhost:8080/swagger-ui.html
+- Neo4j Browser：http://localhost:7474
+
+
+### 模式 2：容器部署模式
+
+**适用场景**：生产部署、完整测试环境
+
+**配置**：
+- **后端**：通过环境变量覆盖
+  ```yaml
+  # docker-compose.yml 中设置
+  environment:
+    - NEO4J_URI=bolt://neo4j:7687  # 使用 Docker 服务名
+  ```
+
+- **前端**：需要修改 `vite.config.js`
+  ```javascript
+  proxy: {
+    '/api': {
+      target: 'http://backend:8080',  // 使用 Docker 服务名
+    }
+  }
+  ```
+
+**启动步骤**：
+```bash
+# 一键启动所有服务
+docker-compose up --build
+```
+
+**访问地址**：与本地模式相同（端口映射）
+
+**配置切换提示**：
+- 本地开发 → 容器：修改 `vite.config.js` 中 `target` 为 `http://backend:8080`
+- 容器 → 本地开发：修改 `vite.config.js` 中 `target` 为 `http://localhost:8080`
+- 后端配置会自动通过环境变量适配，无需手动修改
+
 
 ## 常见问题
 
