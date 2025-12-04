@@ -12,21 +12,21 @@ public class RdfController {
     @Autowired
     private RdfService rdfService;
 
-    // POST Turtle text to import into Neo4j
-    @PostMapping(value = "/import", consumes = "text/turtle")
-    public ResponseEntity<String> importTurtle(@RequestBody String turtle) {
+    // POST RDF data to import into Neo4j (supports Turtle, RDF/XML, JSON-LD, etc.)
+    @PostMapping(value = "/import", consumes = {"text/turtle", "application/rdf+xml", "application/ld+json", MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<String> importRdf(@RequestBody String rdfContent, @RequestHeader(value = "Content-Type", required = false) String contentType) {
         try {
-            rdfService.importTurtle(turtle);
-            return ResponseEntity.ok("Imported");
+            rdfService.importRdf(rdfContent, contentType);
+            return ResponseEntity.ok("RDF data imported successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
-    // Also accept plain text body with turtle
+    // Legacy endpoint for backward compatibility
     @PostMapping(value = "/import-text", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> importTurtleText(@RequestBody String turtle) {
-        return importTurtle(turtle);
+    public ResponseEntity<String> importTurtleText(@RequestBody String rdfContent) {
+        return importRdf(rdfContent, "text/turtle");
     }
 
     // GET export as turtle

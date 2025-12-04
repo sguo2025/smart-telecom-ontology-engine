@@ -25,12 +25,53 @@ public class RdfService {
         return uri;
     }
 
-    // Import Turtle text into Neo4j: create nodes with property `iri`, set labels from rdf:type,
-    // set literal properties for literal objects and relationships for resource objects.
+    // Helper: detect RDF format from content-type or content
+    private Lang detectRdfFormat(String rdfContent, String contentType) {
+        // First, try to determine from content-type
+        if (contentType != null) {
+            contentType = contentType.toLowerCase();
+            if (contentType.contains("rdf+xml") || contentType.contains("application/xml")) {
+                return Lang.RDFXML;
+            } else if (contentType.contains("turtle") || contentType.contains("text/turtle")) {
+                return Lang.TURTLE;
+            } else if (contentType.contains("ld+json") || contentType.contains("application/ld+json")) {
+                return Lang.JSONLD;
+            } else if (contentType.contains("n-triples")) {
+                return Lang.NTRIPLES;
+            } else if (contentType.contains("n3")) {
+                return Lang.N3;
+            }
+        }
+
+        // Auto-detect based on content
+        String trimmed = rdfContent.trim();
+        if (trimmed.startsWith("<?xml") || trimmed.startsWith("<rdf:RDF")) {
+            return Lang.RDFXML;
+        } else if (trimmed.startsWith("{")) {
+            return Lang.JSONLD;
+        } else if (trimmed.contains("@prefix") || trimmed.contains("@base")) {
+            return Lang.TURTLE;
+        }
+
+        // Default to Turtle for backward compatibility
+        return Lang.TURTLE;
+    }
+
+    // Legacy method for backward compatibility
     public void importTurtle(String turtle) {
+        importRdf(turtle, "text/turtle");
+    }
+
+    // Import RDF data into Neo4j: create nodes with property `iri`, set labels from rdf:type,
+    // set literal properties for literal objects and relationships for resource objects.
+    // Supports multiple formats: Turtle, RDF/XML, JSON-LD, etc.
+    public void importRdf(String rdfContent, String contentType) {
         Model model = ModelFactory.createDefaultModel();
-        ByteArrayInputStream in = new ByteArrayInputStream(turtle.getBytes(StandardCharsets.UTF_8));
-        RDFDataMgr.read(model, in, Lang.TURTLE);
+        ByteArrayInputStream in = new ByteArrayInputStream(rdfContent.getBytes(StandardCharsets.UTF_8));
+        
+        // Determine RDF format based on content-type or auto-detection
+        Lang lang = detectRdfFormat(rdfContent, contentType);
+        RDFDataMgr.read(model, in, lang);
 
         // First pass: ensure nodes for all resources (subjects and resource objects)
         Set<String> resourceUris = new HashSet<>();
