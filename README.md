@@ -32,7 +32,7 @@ docker-compose up --build
 或者如果你想保留其他容器只关闭backend：
 ```bash
 docker stop smart-backend
-``
+```
 
 本地访问（localhost）：
 
