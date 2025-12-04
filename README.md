@@ -91,7 +91,9 @@ npm run dev
 docker-compose up neo4j -d
 
 # 2. 启动后端（在 IDE 中 Debug 或使用 Maven）
+ps aux | grep DemoApplication | grep -v grep
 cd backend
+mvn clean compile
 mvn spring-boot:run
 
 # 3. 启动前端
