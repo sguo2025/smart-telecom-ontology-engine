@@ -108,7 +108,8 @@ public class RdfService {
             String subj = e.getKey();
             for (String typeUri : e.getValue()) {
                 String label = localName(typeUri).replaceAll("[^A-Za-z0-9_]", "_");
-                String cy = String.format("MATCH (n {iri:$iri}) SET n:`%s` = coalesce(n.`%s`, true)", label, label);
+                // Add label to node (Neo4j labels cannot be set as properties)
+                String cy = String.format("MATCH (n {iri:$iri}) SET n:`%s`", label);
                 neo4jClient.query(cy).bind(subj).to("iri").run();
             }
         }
