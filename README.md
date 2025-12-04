@@ -28,6 +28,12 @@ GitHub 会自动为你的容器端口创建公网转发 URL。所有服务都可
 docker-compose up --build
 ```
 
+
+或者如果你想保留其他容器只关闭backend：
+```bash
+docker stop smart-backend
+``
+
 本地访问（localhost）：
 
 - 后端 API: http://localhost:8080/api
