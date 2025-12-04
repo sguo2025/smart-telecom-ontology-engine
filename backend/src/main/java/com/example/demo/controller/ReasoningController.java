@@ -38,11 +38,11 @@ public class ReasoningController {
             String rdfData = (String) request.get("rdfData");
             String reasonerTypeStr = (String) request.get("reasonerType");
             String customRules = (String) request.getOrDefault("customRules", "");
-            Boolean saveToNeo4j = (Boolean) request.getOrDefault("saveToNeo4j", false);
-            Boolean useNeo4jData = (Boolean) request.getOrDefault("useNeo4jData", false);
+            Boolean saveToNeo4j = Boolean.TRUE.equals(request.get("saveToNeo4j"));
+            Boolean useNeo4jData = Boolean.TRUE.equals(request.get("useNeo4jData"));
             
             // 如果选择从 Neo4j 读取数据
-            if (useNeo4jData != null && useNeo4jData) {
+            if (Boolean.TRUE.equals(useNeo4jData)) {
                 try {
                     rdfData = rdfService.exportToTurtle();
                     if (rdfData == null || rdfData.trim().isEmpty()) {
@@ -55,12 +55,13 @@ public class ReasoningController {
                         createErrorResponse("从 Neo4j 读取数据失败: " + e.getMessage())
                     );
                 }
-            }
-            
-            if (rdfData == null || rdfData.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                    createErrorResponse("RDF data is required")
-                );
+            } else {
+                // 如果不是从 Neo4j 加载，则检查用户提供的 rdfData
+                if (rdfData == null || rdfData.trim().isEmpty()) {
+                    return ResponseEntity.badRequest().body(
+                        createErrorResponse("RDF data is required")
+                    );
+                }
             }
             
             if (reasonerTypeStr == null || reasonerTypeStr.trim().isEmpty()) {

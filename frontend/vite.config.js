@@ -8,7 +8,7 @@ export default defineConfig({
     port: 8888,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://smart-backend:8080',
         changeOrigin: true,
         secure: false
       }
