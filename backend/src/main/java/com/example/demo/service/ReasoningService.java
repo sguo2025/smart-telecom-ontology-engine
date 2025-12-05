@@ -250,16 +250,25 @@ public class ReasoningService {
     
     /**
      * 加载CRM过户流程推理规则
-     * 从工作区根目录读取 transfer-process-rules.rules 文件
+     * 从容器内或工作区读取 transfer-process-rules.rules 文件
      */
     public String loadTransferProcessRules() {
         try {
-            // 读取规则文件
-            java.nio.file.Path rulesPath = java.nio.file.Paths.get("/workspaces/smart-telecom-ontology-engine/transfer-process-rules.rules");
-            if (!java.nio.file.Files.exists(rulesPath)) {
-                throw new IllegalStateException("规则文件不存在: " + rulesPath);
+            // 尝试多个路径
+            String[] possiblePaths = {
+                "/app/transfer-process-rules.rules",  // Docker容器内路径
+                "/workspaces/smart-telecom-ontology-engine/transfer-process-rules.rules",  // 开发环境路径
+                "transfer-process-rules.rules"  // 相对路径
+            };
+            
+            for (String pathStr : possiblePaths) {
+                java.nio.file.Path rulesPath = java.nio.file.Paths.get(pathStr);
+                if (java.nio.file.Files.exists(rulesPath)) {
+                    return new String(java.nio.file.Files.readAllBytes(rulesPath), StandardCharsets.UTF_8);
+                }
             }
-            return new String(java.nio.file.Files.readAllBytes(rulesPath), StandardCharsets.UTF_8);
+            
+            throw new IllegalStateException("规则文件不存在，尝试的路径: " + String.join(", ", possiblePaths));
         } catch (Exception e) {
             throw new RuntimeException("加载CRM过户流程规则失败: " + e.getMessage(), e);
         }

@@ -22,7 +22,8 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: ./backend/Dockerfile
     container_name: smart-backend
     environment:
       - NEO4J_URI=bolt://neo4j:7687

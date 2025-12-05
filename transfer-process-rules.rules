@@ -12,153 +12,123 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 # ==============================================================================
-# 规则1：自动推理流程必须包含的4个步骤
+# Rule 1: Auto-infer all 4 required process steps
 # ==============================================================================
 
 [Rule_AddCustomerLocation:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程必须包含"客户定位"步骤
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#CustomerLocation>)
 ]
 
 [Rule_AddTargetCustomerVerification:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程必须包含"目标客户核对"步骤
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#TargetCustomerVerification>)
 ]
 
 [Rule_AddElectronicSignature:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程必须包含"电子签名"步骤
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#ElectronicSignature>)
 ]
 
 [Rule_AddOrderSummaryDisplay:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程必须包含"订单概要展示"步骤
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#OrderSummaryDisplay>)
 ]
 
 # ==============================================================================
-# 规则2：根据客户信息推理验证方式
+# Rule 2: Infer verification method based on customer info
 # ==============================================================================
 
 [Rule_InferIDCardVerification:
-    # 如果流程关联的原客户提供了身份证号
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?customer),
     (?customer <http://example.com/crm/transfer#hasIDCardNumber> ?idcard),
-    # 且身份证号不为空
     notEqual(?idcard, "")
     ->
-    # 则该流程使用"人证比对验证"
     (?process <http://example.com/crm/transfer#usesVerificationMethod> <http://example.com/crm/transfer#IDCardVerification>)
 ]
 
 [Rule_InferSMSVerification:
-    # 如果流程关联的原客户提供了业务号码
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?customer),
     (?customer <http://example.com/crm/transfer#hasBusinessNumber> ?phone),
-    # 且业务号码不为空
     notEqual(?phone, ""),
-    # 但没有提供身份证号（或身份证为空）
     noValue(?customer <http://example.com/crm/transfer#hasIDCardNumber>)
     ->
-    # 则该流程使用"短信验证码验证"
     (?process <http://example.com/crm/transfer#usesVerificationMethod> <http://example.com/crm/transfer#SMSVerification>)
 ]
 
 # ==============================================================================
-# 规则3：自动应用业务规则约束
+# Rule 3: Auto-apply business rule constraints
 # ==============================================================================
 
 [Rule_ApplyArrearsRule:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程受"用户欠费规则"约束
     (?process <http://example.com/crm/transfer#isConstrainedBy> <http://example.com/crm/transfer#ArrearsRule>)
 ]
 
 [Rule_ApplyPendingOrderRule:
-    # 如果存在一个过户流程实例
     (?process rdf:type <http://example.com/crm/transfer#TransferProcess>)
     ->
-    # 则该流程受"存在在途单规则"约束
     (?process <http://example.com/crm/transfer#isConstrainedBy> <http://example.com/crm/transfer#PendingOrderRule>)
 ]
 
 # ==============================================================================
-# 规则4：业务规则违规检测
+# Rule 4: Business rule violation detection
 # ==============================================================================
 
 [Rule_DetectArrearsViolation:
-    # 如果流程关联的原客户存在欠费
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?customer),
-    (?customer <http://example.com/crm/transfer#hasArrearsStatus> "true"^^<http://www.w3.org/2001/XMLSchema#boolean>)
+    (?customer <http://example.com/crm/transfer#hasArrearsStatus> true)
     ->
-    # 则标记该流程违反了欠费规则（可扩展为阻断属性）
     (?process <http://example.com/crm/transfer#violatesRule> <http://example.com/crm/transfer#ArrearsRule>)
 ]
 
 [Rule_DetectPendingOrderViolation:
-    # 如果流程关联的原客户存在在途单
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?customer),
-    (?customer <http://example.com/crm/transfer#hasPendingOrderStatus> "true"^^<http://www.w3.org/2001/XMLSchema#boolean>)
+    (?customer <http://example.com/crm/transfer#hasPendingOrderStatus> true)
     ->
-    # 则标记该流程违反了在途单规则（可扩展为阻断属性）
     (?process <http://example.com/crm/transfer#violatesRule> <http://example.com/crm/transfer#PendingOrderRule>)
 ]
 
 # ==============================================================================
-# 规则5：步骤顺序的传递性推理（辅助规则）
+# Rule 5: Transitive step order inference
 # ==============================================================================
 
 [Rule_TransitiveStepOrder:
-    # 如果步骤A的前置是B，步骤B的前置是C
     (?stepA <http://example.com/crm/transfer#hasPredecessorStep> ?stepB),
     (?stepB <http://example.com/crm/transfer#hasPredecessorStep> ?stepC)
     ->
-    # 则步骤A的前置也包括C（传递性）
     (?stepA <http://example.com/crm/transfer#hasPredecessorStep> ?stepC)
 ]
 
 # ==============================================================================
-# 规则6：订单生成后的关联推理
+# Rule 6: Order-customer relationship inference
 # ==============================================================================
 
 [Rule_LinkOrderToCustomers:
-    # 如果流程生成了订单，且流程关联了原客户和目标客户
     (?process <http://example.com/crm/transfer#generatesTransferOrder> ?order),
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?origCustomer),
     (?process <http://example.com/crm/transfer#relatesTargetCustomer> ?targetCustomer)
     ->
-    # 则订单包含原客户和目标客户信息
     (?order <http://example.com/crm/transfer#includesOriginalCustomer> ?origCustomer),
     (?order <http://example.com/crm/transfer#includesTargetCustomer> ?targetCustomer)
 ]
 
 # ==============================================================================
-# 规则7：流程完整性验证
+# Rule 7: Process completeness validation
 # ==============================================================================
 
 [Rule_ProcessIsComplete:
-    # 如果流程包含了所有4个步骤
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#CustomerLocation>),
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#TargetCustomerVerification>),
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#ElectronicSignature>),
     (?process <http://example.com/crm/transfer#hasProcessStep> <http://example.com/crm/transfer#OrderSummaryDisplay>),
-    # 且关联了原客户和目标客户
     (?process <http://example.com/crm/transfer#relatesOriginalCustomer> ?origCustomer),
     (?process <http://example.com/crm/transfer#relatesTargetCustomer> ?targetCustomer)
     ->
-    # 则标记该流程为完整流程
-    (?process <http://example.com/crm/transfer#isCompleteProcess> "true"^^<http://www.w3.org/2001/XMLSchema#boolean>)
+    (?process <http://example.com/crm/transfer#isCompleteProcess> true)
 ]
