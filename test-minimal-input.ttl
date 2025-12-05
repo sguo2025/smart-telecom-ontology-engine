@@ -1,0 +1,50 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix crm: <http://example.com/crm/transfer#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# =============================================================================
+# 最小输入测试用例：仅定义过户流程实例 + 原客户 + 目标客户
+# 目标：通过推理自动补全所有4个流程步骤、验证方式、业务规则等
+# =============================================================================
+
+# 原客户实例（无欠费、无在途单、提供身份证号）
+crm:TestOriginalCustomer_001
+    a crm:OriginalCustomer ;
+    crm:hasIDCardNumber "110101199001011234"^^xsd:string ;
+    crm:hasBusinessNumber "13800138000"^^xsd:string ;
+    crm:hasArrearsStatus false ;
+    crm:hasPendingOrderStatus false .
+
+# 目标客户实例
+crm:TestTargetCustomer_001
+    a crm:TargetCustomer ;
+    crm:hasIDCardNumber "110101199505055678"^^xsd:string ;
+    crm:hasBusinessNumber "13900139000"^^xsd:string .
+
+# 过户流程实例（仅关联两个客户，不手工定义步骤）
+crm:TestTransferProcess_001
+    a crm:TransferProcess ;
+    crm:relatesOriginalCustomer crm:TestOriginalCustomer_001 ;
+    crm:relatesTargetCustomer crm:TestTargetCustomer_001 .
+
+# =============================================================================
+# 预期推理结果：
+# 1. 自动添加4个步骤:
+#    - crm:hasProcessStep crm:CustomerLocation
+#    - crm:hasProcessStep crm:TargetCustomerVerification
+#    - crm:hasProcessStep crm:ElectronicSignature
+#    - crm:hasProcessStep crm:OrderSummaryDisplay
+#
+# 2. 根据身份证号推理验证方式:
+#    - crm:usesVerificationMethod crm:IDCardVerification
+#
+# 3. 自动应用业务规则约束:
+#    - crm:isConstrainedBy crm:ArrearsRule
+#    - crm:isConstrainedBy crm:PendingOrderRule
+#
+# 4. 检测无规则违规（因为hasArrearsStatus=false, hasPendingOrderStatus=false）
+#
+# 5. 标记流程为完整流程:
+#    - crm:isCompleteProcess "true"^^xsd:boolean
+# =============================================================================

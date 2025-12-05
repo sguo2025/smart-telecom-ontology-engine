@@ -284,7 +284,53 @@
     <!-- 基于OWL的约束语法，实现流程顺序、验证方式映射、规则约束等 -->
     <!-- ============================================== -->
 
-    <!-- 5.1 流程步骤顺序约束：定义4个步骤的先后关系 -->
+    <!-- 5.1 过户流程类的约束：定义流程必须满足的条件 -->
+    <!-- 约束1：任何过户流程必须包含客户定位步骤 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferProcess">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://example.com/crm/transfer#hasProcessStep"/>
+                <owl:someValuesFrom rdf:resource="http://example.com/crm/transfer#CustomerLocation"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+
+    <!-- 约束2：任何过户流程必须包含目标客户核对步骤 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferProcess">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://example.com/crm/transfer#hasProcessStep"/>
+                <owl:someValuesFrom rdf:resource="http://example.com/crm/transfer#TargetCustomerVerification"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+
+    <!-- 约束3：任何过户流程必须包含电子签名步骤 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferProcess">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://example.com/crm/transfer#hasProcessStep"/>
+                <owl:someValuesFrom rdf:resource="http://example.com/crm/transfer#ElectronicSignature"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+
+    <!-- 约束4：任何过户流程必须包含订单概要展示步骤 -->
+    <owl:Class rdf:about="http://example.com/crm/transfer#TransferProcess">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://example.com/crm/transfer#hasProcessStep"/>
+                <owl:someValuesFrom rdf:resource="http://example.com/crm/transfer#OrderSummaryDisplay"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+
+    <!-- 约束5：hasPredecessorStep属性是传递的（A→B且B→C则A→C） -->
+    <owl:ObjectProperty rdf:about="http://example.com/crm/transfer#hasPredecessorStep">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    </owl:ObjectProperty>
+
+    <!-- 5.2 流程步骤顺序约束：定义4个步骤的先后关系 -->
     <!-- 客户定位：无前置步骤（流程第一步） -->
     <rdf:Description rdf:about="http://example.com/crm/transfer#CustomerLocation">
         <!-- 无前置步骤 -->

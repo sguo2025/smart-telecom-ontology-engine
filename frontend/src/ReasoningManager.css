@@ -6,9 +6,44 @@
 
 .reasoning-manager h2 {
   color: #2c3e50;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   font-size: 28px;
   font-weight: 600;
+}
+
+/* 视图模式切换 */
+.view-mode-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: white;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn:hover {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border-color: #2980b9;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
 .reasoning-container {
@@ -312,6 +347,147 @@
   font-size: 24px;
   font-weight: 700;
   color: #2c3e50;
+}
+
+/* 信息框 */
+.info-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 4px solid #4caf50;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.info-box strong {
+  color: #2e7d32;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.info-box p {
+  margin: 0 0 4px 0;
+  color: #555;
+}
+
+.info-box ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.info-box li {
+  padding: 4px 0;
+  color: #555;
+}
+
+/* 流程步骤视图 */
+.steps-view {
+  margin-top: 12px;
+}
+
+.steps-view h4 {
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+  transition: all 0.2s;
+}
+
+.step-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #3498db;
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.step-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* 违规检测 */
+.violations-section {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  border-left: 4px solid #e74c3c;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.violations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.violation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #ffcdd2;
+}
+
+.violation-icon {
+  font-size: 20px;
+}
+
+.violation-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #c0392b;
+}
+
+.success-message {
+  background: linear-gradient(135deg, #e8f8f5 0%, #d5f4e6 100%);
+  border-left: 4px solid #27ae60;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.success-message p {
+  margin: 0;
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.stat-card.error {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  border-left-color: #e74c3c;
 }
 
 /* 数据视图 */

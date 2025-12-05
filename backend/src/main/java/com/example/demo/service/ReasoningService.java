@@ -248,6 +248,128 @@ public class ReasoningService {
         return examples;
     }
     
+    /**
+     * 加载CRM过户流程推理规则
+     * 从工作区根目录读取 transfer-process-rules.rules 文件
+     */
+    public String loadTransferProcessRules() {
+        try {
+            // 读取规则文件
+            java.nio.file.Path rulesPath = java.nio.file.Paths.get("/workspaces/smart-telecom-ontology-engine/transfer-process-rules.rules");
+            if (!java.nio.file.Files.exists(rulesPath)) {
+                throw new IllegalStateException("规则文件不存在: " + rulesPath);
+            }
+            return new String(java.nio.file.Files.readAllBytes(rulesPath), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("加载CRM过户流程规则失败: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 推理完整的过户流程（从最小输入推理所有步骤）
+     * 
+     * @param minimalRdfData 最小RDF数据（仅包含TransferProcess实例 + 原客户 + 目标客户）
+     * @return 推理结果（包含所有4个步骤、验证方式、业务规则等）
+     */
+    public Map<String, Object> inferCompleteTransferProcess(String minimalRdfData) {
+        long startTime = System.currentTimeMillis();
+        
+        // 1. 加载CRM过户流程推理规则
+        String rules = loadTransferProcessRules();
+        
+        // 2. 执行推理
+        String resultTurtle = performReasoning(minimalRdfData, ReasonerType.CUSTOM, rules);
+        
+        // 3. 统计推理结果
+        Model originalModel = parseRdfData(minimalRdfData);
+        Model inferredModel = parseRdfData(resultTurtle);
+        
+        long originalTriples = originalModel.size();
+        long inferredTriples = inferredModel.size();
+        long newTriples = inferredTriples - originalTriples;
+        
+        // 4. 分析推理出的流程步骤
+        List<String> inferredSteps = analyzeInferredSteps(inferredModel);
+        
+        // 5. 检测业务规则违规
+        List<String> ruleViolations = detectRuleViolations(inferredModel);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("reasonerType", "CUSTOM (CRM Transfer Process Rules)");
+        result.put("originalTriples", originalTriples);
+        result.put("inferredTriples", inferredTriples);
+        result.put("newTriples", newTriples);
+        result.put("executionTime", System.currentTimeMillis() - startTime);
+        result.put("resultData", resultTurtle);
+        result.put("inferredSteps", inferredSteps);
+        result.put("inferredStepCount", inferredSteps.size());
+        result.put("ruleViolations", ruleViolations);
+        result.put("hasViolations", !ruleViolations.isEmpty());
+        
+        return result;
+    }
+    
+    /**
+     * 分析推理出的流程步骤
+     */
+    private List<String> analyzeInferredSteps(Model model) {
+        List<String> steps = new ArrayList<>();
+        String queryStr = 
+            "PREFIX crm: <http://example.com/crm/transfer#> " +
+            "SELECT ?step WHERE { " +
+            "  ?process crm:hasProcessStep ?step . " +
+            "} ORDER BY ?step";
+        
+        try (org.apache.jena.query.QueryExecution qexec = 
+            org.apache.jena.query.QueryExecutionFactory.create(queryStr, model)) {
+            org.apache.jena.query.ResultSet results = qexec.execSelect();
+            while (results.hasNext()) {
+                org.apache.jena.query.QuerySolution soln = results.nextSolution();
+                org.apache.jena.rdf.model.Resource step = soln.getResource("step");
+                if (step != null) {
+                    String stepName = step.getLocalName();
+                    if (stepName != null && !steps.contains(stepName)) {
+                        steps.add(stepName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // 忽略查询错误
+        }
+        return steps;
+    }
+    
+    /**
+     * 检测业务规则违规
+     */
+    private List<String> detectRuleViolations(Model model) {
+        List<String> violations = new ArrayList<>();
+        String queryStr = 
+            "PREFIX crm: <http://example.com/crm/transfer#> " +
+            "SELECT ?rule WHERE { " +
+            "  ?process crm:violatesRule ?rule . " +
+            "}";
+        
+        try (org.apache.jena.query.QueryExecution qexec = 
+            org.apache.jena.query.QueryExecutionFactory.create(queryStr, model)) {
+            org.apache.jena.query.ResultSet results = qexec.execSelect();
+            while (results.hasNext()) {
+                org.apache.jena.query.QuerySolution soln = results.nextSolution();
+                org.apache.jena.rdf.model.Resource rule = soln.getResource("rule");
+                if (rule != null) {
+                    String ruleName = rule.getLocalName();
+                    if (ruleName != null && !violations.contains(ruleName)) {
+                        violations.add(ruleName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // 忽略查询错误
+        }
+        return violations;
+    }
+    
     // ========== 私有辅助方法 ==========
     
     /**

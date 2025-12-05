@@ -166,6 +166,41 @@ public class ReasoningController {
         return ResponseEntity.ok(response);
     }
     
+    /**
+     * 加载CRM过户流程推理规则
+     */
+    @GetMapping(value = "/transfer-process-rules", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> getTransferProcessRules() {
+        try {
+            String rules = reasoningService.loadTransferProcessRules();
+            return ResponseEntity.ok(rules);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("加载规则失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 推理完整的过户流程（从最小输入推理所有步骤）
+     */
+    @PostMapping(value = "/infer-transfer-process", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> inferCompleteTransferProcess(@RequestBody String minimalRdfData) {
+        try {
+            if (minimalRdfData == null || minimalRdfData.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                    createErrorResponse("RDF data is required")
+                );
+            }
+            
+            Map<String, Object> result = reasoningService.inferCompleteTransferProcess(minimalRdfData);
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(
+                createErrorResponse("推理失败: " + e.getMessage())
+            );
+        }
+    }
+    
     // 辅助方法：创建错误响应
     private Map<String, Object> createErrorResponse(String message) {
         Map<String, Object> error = new HashMap<>();

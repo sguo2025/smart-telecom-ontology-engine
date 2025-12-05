@@ -14,6 +14,8 @@ export default function ReasoningManager() {
   const [showRules, setShowRules] = useState(false)
   const [activeTab, setActiveTab] = useState('result') // result, inferred, stats
   const [useNeo4jData, setUseNeo4jData] = useState(false)
+  const [viewMode, setViewMode] = useState('standard') // standard, transfer-process
+  const [transferProcessResult, setTransferProcessResult] = useState(null)
 
   useEffect(() => {
     // 加载推理器类型
@@ -147,6 +149,83 @@ export default function ReasoningManager() {
     }
   }
 
+  // 加载CRM过户流程测试数据
+  const handleLoadTransferProcessTest = async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      // 加载测试数据
+      const testData = `@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix crm: <http://example.com/crm/transfer#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# 原客户实例（无欠费、无在途单、提供身份证号）
+crm:TestOriginalCustomer_001
+    a crm:OriginalCustomer ;
+    crm:hasIDCardNumber "110101199001011234"^^xsd:string ;
+    crm:hasBusinessNumber "13800138000"^^xsd:string ;
+    crm:hasArrearsStatus false ;
+    crm:hasPendingOrderStatus false .
+
+# 目标客户实例
+crm:TestTargetCustomer_001
+    a crm:TargetCustomer ;
+    crm:hasIDCardNumber "110101199505055678"^^xsd:string ;
+    crm:hasBusinessNumber "13900139000"^^xsd:string .
+
+# 过户流程实例（仅关联两个客户，不手工定义步骤）
+crm:TestTransferProcess_001
+    a crm:TransferProcess ;
+    crm:relatesOriginalCustomer crm:TestOriginalCustomer_001 ;
+    crm:relatesTargetCustomer crm:TestTargetCustomer_001 .`
+      
+      setRdfData(testData)
+      setViewMode('transfer-process')
+      alert('✓ 已加载CRM过户流程测试数据（最小输入）')
+    } catch (err) {
+      setError(`加载失败: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 执行过户流程推理
+  const handleInferTransferProcess = async () => {
+    if (!rdfData.trim()) {
+      setError('请输入最小RDF数据（过户流程+原客户+目标客户）')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setTransferProcessResult(null)
+
+    try {
+      const response = await fetch('/api/reasoning/infer-transfer-process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: rdfData,
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setTransferProcessResult(data)
+        setActiveTab('stats')
+      } else {
+        setError(data.error || '推理执行失败')
+      }
+    } catch (err) {
+      setError(`网络错误: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // 加载示例
   const handleLoadExample = (exampleKey) => {
     const example = examples[exampleKey]
@@ -162,6 +241,7 @@ export default function ReasoningManager() {
     } else {
       setReasonerType('RDFS')
     }
+    setViewMode('standard')
   }
 
   // 清空
@@ -187,27 +267,107 @@ export default function ReasoningManager() {
     <div className="reasoning-manager">
       <h2>🧠 逻辑推理引擎</h2>
 
+      {/* 视图模式切换 */}
+      <div className="view-mode-selector">
+        <button
+          className={`mode-btn ${viewMode === 'standard' ? 'active' : ''}`}
+          onClick={() => {
+            setViewMode('standard')
+            setTransferProcessResult(null)
+          }}
+        >
+          📊 标准推理
+        </button>
+        <button
+          className={`mode-btn ${viewMode === 'transfer-process' ? 'active' : ''}`}
+          onClick={() => {
+            setViewMode('transfer-process')
+            setResult(null)
+          }}
+        >
+          🔄 CRM过户流程推理
+        </button>
+      </div>
+
       <div className="reasoning-container">
         {/* 左侧：输入面板 */}
         <div className="reasoning-panel input-panel">
-          <h3>输入配置</h3>
+          <h3>{viewMode === 'transfer-process' ? 'CRM过户流程推理' : '输入配置'}</h3>
 
-          {/* 推理器类型选择 */}
-          <div className="form-group">
-            <label>推理器类型:</label>
-            <select
-              value={reasonerType}
-              onChange={(e) => setReasonerType(e.target.value)}
-              disabled={loading}
-              className="form-select"
-            >
-              {Object.entries(reasonerTypes).map(([type, desc]) => (
-                <option key={type} value={type}>
-                  {type} - {desc}
-                </option>
-              ))}
-            </select>
-          </div>
+          {viewMode === 'transfer-process' ? (
+            // CRM过户流程推理模式
+            <>
+              <div className="info-box" style={{ marginBottom: '16px' }}>
+                <strong>🎯 功能说明：</strong>
+                <p>从最小输入（过户流程实例 + 原客户 + 目标客户）自动推理出：</p>
+                <ul style={{ marginLeft: '20px', marginTop: '8px' }}>
+                  <li>✅ 4个流程步骤（客户定位、目标客户核对、电子签名、订单展示）</li>
+                  <li>✅ 验证方式（人证比对/短信验证）</li>
+                  <li>✅ 业务规则约束（欠费、在途单）</li>
+                  <li>✅ 规则违规检测</li>
+                </ul>
+              </div>
+
+              <div className="form-group">
+                <label>最小RDF输入数据 (Turtle格式):</label>
+                <textarea
+                  value={rdfData}
+                  onChange={(e) => setRdfData(e.target.value)}
+                  placeholder="输入最小RDF数据：过户流程实例 + 原客户 + 目标客户"
+                  rows="12"
+                  disabled={loading}
+                  className="form-textarea"
+                />
+                <div style={{ marginTop: '8px' }}>
+                  <button
+                    onClick={handleLoadTransferProcessTest}
+                    disabled={loading}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    📥 加载测试数据
+                  </button>
+                  <span style={{ fontSize: '12px', color: '#7f8c8d', marginLeft: '8px' }}>
+                    加载预定义的最小测试用例
+                  </span>
+                </div>
+              </div>
+
+              <div className="button-group">
+                <button
+                  onClick={handleInferTransferProcess}
+                  disabled={loading}
+                  className="btn btn-primary"
+                >
+                  {loading ? '推理中...' : '🚀 推理完整流程'}
+                </button>
+                <button
+                  onClick={handleClear}
+                  disabled={loading}
+                  className="btn btn-outline"
+                >
+                  清空
+                </button>
+              </div>
+            </>
+          ) : (
+            // 标准推理模式
+            <>
+              {/* 推理器类型选择 */}
+              <div className="form-group">
+                <label>推理器类型:</label>
+                <select
+                  value={reasonerType}
+                  onChange={(e) => setReasonerType(e.target.value)}
+                  disabled={loading}
+                  className="form-select"
+                >
+                  {Object.entries(reasonerTypes).map(([type, desc]) => (
+                    <option key={type} value={type}>
+                      {type} - {desc}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
           {/* RDF 数据输入 */}
           <div className="form-group">
@@ -294,22 +454,24 @@ export default function ReasoningManager() {
             </button>
           </div>
 
-          {/* 示例加载 */}
-          <div className="examples-section">
-            <h4>示例数据</h4>
-            <div className="example-buttons">
-              {Object.keys(examples).map((key) => (
-                <button
-                  key={key}
-                  onClick={() => handleLoadExample(key)}
-                  disabled={loading}
-                  className="btn btn-sm btn-secondary"
-                >
-                  {key.replace(/_/g, ' ')}
-                </button>
-              ))}
-            </div>
-          </div>
+              {/* 示例加载 */}
+              <div className="examples-section">
+                <h4>示例数据</h4>
+                <div className="example-buttons">
+                  {Object.keys(examples).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => handleLoadExample(key)}
+                      disabled={loading}
+                      className="btn btn-sm btn-secondary"
+                    >
+                      {key.replace(/_/g, ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 右侧：结果面板 */}
@@ -323,9 +485,9 @@ export default function ReasoningManager() {
             </div>
           )}
 
-          {!loading && !result && !error && (
+          {!loading && !result && !transferProcessResult && !error && (
             <div className="empty-state">
-              <p>配置推理参数并点击"执行推理"</p>
+              <p>{viewMode === 'transfer-process' ? '加载测试数据并点击"推理完整流程"' : '配置推理参数并点击"执行推理"'}</p>
             </div>
           )}
 
@@ -335,7 +497,139 @@ export default function ReasoningManager() {
             </div>
           )}
 
-          {result && (
+          {/* CRM过户流程推理结果 */}
+          {transferProcessResult && viewMode === 'transfer-process' && (
+            <div className="result-content">
+              {/* 标签页 */}
+              <div className="tabs">
+                <button
+                  className={`tab ${activeTab === 'stats' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('stats')}
+                >
+                  📊 推理统计
+                </button>
+                <button
+                  className={`tab ${activeTab === 'steps' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('steps')}
+                >
+                  🔄 流程步骤
+                </button>
+                <button
+                  className={`tab ${activeTab === 'result' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('result')}
+                >
+                  📄 完整结果
+                </button>
+              </div>
+
+              {/* 标签页内容 */}
+              {activeTab === 'stats' && (
+                <div className="stats-view">
+                  <div className="stat-card">
+                    <div className="stat-label">推理器类型</div>
+                    <div className="stat-value" style={{ fontSize: '12px' }}>
+                      {transferProcessResult.reasonerType}
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-label">原始三元组</div>
+                    <div className="stat-value">{transferProcessResult.originalTriples}</div>
+                  </div>
+                  <div className="stat-card highlight">
+                    <div className="stat-label">推理后三元组</div>
+                    <div className="stat-value">{transferProcessResult.inferredTriples}</div>
+                  </div>
+                  <div className="stat-card success">
+                    <div className="stat-label">新增三元组</div>
+                    <div className="stat-value">+{transferProcessResult.newTriples}</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-label">推理出的步骤数</div>
+                    <div className="stat-value">{transferProcessResult.inferredStepCount}</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-label">执行时间</div>
+                    <div className="stat-value">{transferProcessResult.executionTime} ms</div>
+                  </div>
+                  <div className={`stat-card ${transferProcessResult.hasViolations ? 'error' : 'success'}`}>
+                    <div className="stat-label">规则违规</div>
+                    <div className="stat-value">
+                      {transferProcessResult.hasViolations ? '⚠️ 有违规' : '✅ 无违规'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'steps' && (
+                <div className="steps-view">
+                  <h4>推理出的流程步骤</h4>
+                  {transferProcessResult.inferredSteps && transferProcessResult.inferredSteps.length > 0 ? (
+                    <div className="steps-list">
+                      {transferProcessResult.inferredSteps.map((step, index) => (
+                        <div key={index} className="step-item">
+                          <div className="step-number">{index + 1}</div>
+                          <div className="step-name">{step}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>未推理出任何步骤</p>
+                  )}
+
+                  {transferProcessResult.hasViolations && (
+                    <div className="violations-section" style={{ marginTop: '24px' }}>
+                      <h4 style={{ color: '#e74c3c' }}>⚠️ 业务规则违规</h4>
+                      <div className="violations-list">
+                        {transferProcessResult.ruleViolations.map((violation, index) => (
+                          <div key={index} className="violation-item">
+                            <span className="violation-icon">⚠️</span>
+                            <span className="violation-name">{violation}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!transferProcessResult.hasViolations && (
+                    <div className="success-message" style={{ marginTop: '24px' }}>
+                      <p>✅ 流程满足所有业务规则约束</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'result' && (
+                <div className="data-view">
+                  <textarea
+                    value={transferProcessResult.resultData}
+                    readOnly
+                    rows="20"
+                    className="form-textarea result-textarea"
+                  />
+                  <div className="button-group">
+                    <button
+                      onClick={() => handleDownload(transferProcessResult.resultData, `transfer_process_result_${Date.now()}.ttl`)}
+                      className="btn btn-success btn-sm"
+                    >
+                      💾 下载
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(transferProcessResult.resultData)
+                        alert('已复制到剪贴板')
+                      }}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      📋 复制
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 标准推理结果 */}
+          {result && viewMode === 'standard' && (
             <div className="result-content">
               {/* 标签页 */}
               <div className="tabs">
