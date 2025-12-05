@@ -14,7 +14,7 @@ echo ""
 API_URL="http://localhost:8080/api/reasoning"
 
 # 测试文件路径
-TEST_FILE="/workspaces/smart-telecom-ontology-engine/test-minimal-input.ttl"
+TEST_FILE="/workspaces/smart-telecom-ontology-engine/ontology/test-minimal-input.ttl"
 
 # 检查测试文件是否存在
 if [ ! -f "$TEST_FILE" ]; then
@@ -31,7 +31,7 @@ TEST_DATA=$(cat "$TEST_FILE")
 echo "========================================"
 echo "测试1: 验证推理规则文件"
 echo "========================================"
-RULES=$(cat /workspaces/smart-telecom-ontology-engine/transfer-process-rules.rules)
+RULES=$(cat /workspaces/smart-telecom-ontology-engine/ontology/transfer-process-rules.rules)
 echo "✅ 推理规则文件加载成功"
 echo "规则行数: $(echo "$RULES" | wc -l)"
 echo ""

@@ -99,7 +99,7 @@ curl -X POST http://localhost:8080/api/reasoning/execute \
 ```bash
 curl -X POST http://localhost:8080/api/rdf/import \
   -H "Content-Type: text/turtle" \
-  --data-binary "@crm-transfer-ontology.rdf"
+  --data-binary "@ontology/crm-transfer-ontology.rdf"
 ```
 
 ### 5. 导出 RDF 数据
@@ -112,7 +112,7 @@ curl http://localhost:8080/api/rdf/export
 运行完整的推理测试套件:
 
 ```bash
-./test_reasoning.sh
+./ontology/test_reasoning.sh
 ```
 
 预期输出:

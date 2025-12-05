@@ -10,6 +10,6 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/smart-telecom-backend-0.1.0.jar app.jar
 # 复制推理规则文件到容器
-COPY transfer-process-rules.rules /app/transfer-process-rules.rules
+COPY ontology/transfer-process-rules.rules /app/ontology/transfer-process-rules.rules
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]

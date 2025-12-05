@@ -105,18 +105,18 @@ Content-Type: text/plain
 ## 🧪 测试用例
 
 ### 测试数据文件
-- `/workspaces/smart-telecom-ontology-engine/test-minimal-input.ttl`
+- `/workspaces/smart-telecom-ontology-engine/ontology/test-minimal-input.ttl`
 
 ### 测试脚本
 ```bash
-bash /workspaces/smart-telecom-ontology-engine/test_transfer_inference.sh
+bash /workspaces/smart-telecom-ontology-engine/ontology/test_transfer_inference.sh
 ```
 
 ### 手动测试
 ```bash
 curl -X POST http://localhost:8080/api/reasoning/infer-transfer-process \
   -H "Content-Type: text/plain" \
-  --data-binary '@test-minimal-input.ttl' | jq '.'
+  --data-binary '@ontology/test-minimal-input.ttl' | jq '.'
 ```
 
 ---

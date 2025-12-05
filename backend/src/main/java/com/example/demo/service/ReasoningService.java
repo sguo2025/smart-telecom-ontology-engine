@@ -256,9 +256,9 @@ public class ReasoningService {
         try {
             // 尝试多个路径
             String[] possiblePaths = {
-                "/app/transfer-process-rules.rules",  // Docker容器内路径
-                "/workspaces/smart-telecom-ontology-engine/transfer-process-rules.rules",  // 开发环境路径
-                "transfer-process-rules.rules"  // 相对路径
+                "/app/ontology/transfer-process-rules.rules",  // Docker容器内路径
+                "/workspaces/smart-telecom-ontology-engine/ontology/transfer-process-rules.rules",  // 开发环境路径
+                "ontology/transfer-process-rules.rules"  // 相对路径
             };
             
             for (String pathStr : possiblePaths) {
