@@ -48,7 +48,7 @@ echo ""
 echo "正在调用推理API..."
 RESPONSE=$(curl -s -X POST "$API_URL/infer-transfer-process" \
   -H "Content-Type: text/plain" \
-  -d "$TEST_DATA")
+  --data-binary "@$TEST_FILE")
 
 echo ""
 echo "推理结果："
@@ -117,8 +117,11 @@ else
     echo "❌ 未推理出新三元组"
 fi
 
-# 保存推理结果到文件
-RESULT_FILE="/workspaces/smart-telecom-ontology-engine/test-inference-result.ttl"
+# 保存推理结果到文件（使用时间戳避免覆盖）
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+RESULT_DIR="/tmp/ontology-test-results"
+mkdir -p "$RESULT_DIR"
+RESULT_FILE="$RESULT_DIR/inference-result-${TIMESTAMP}.ttl"
 echo "$RESPONSE" | jq -r '.resultData' > "$RESULT_FILE"
 echo "💾 推理结果已保存到: $RESULT_FILE"
 
